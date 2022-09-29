@@ -1,0 +1,7 @@
+{
+    "connection":{
+        "use_tcp":0,
+        "timeout":5,
+        "recv_max_bytes":65535
+    }
+}

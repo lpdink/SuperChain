@@ -1,11 +1,7 @@
 import json
-
-
-def get_config(config_path):
-    with open(config_path, "r") as file:
-        content = file.read()
-    data = json.loads(content)
-    return Config(**data)
+import os
+CONFIG_PATH = os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), "../resources/config.json")
 
 
 class Config():
@@ -13,7 +9,17 @@ class Config():
         for k, v in kwargs.items():
             if type(v) == dict:
                 v = Config(**v)
+            if type(v) == list:
+                for index, item in enumerate(v):
+                    if type(item) == dict:
+                        v[index] = Config(**item)
             self[k] = v
+
+    def get(self, key, default=None):
+        if key in self.__dict__.keys():
+            return getattr(self, key)
+        else:
+            return default
 
     def keys(self):
         return self.__dict__.keys()
@@ -28,6 +34,7 @@ class Config():
         return len(self.__dict__)
 
     def __getitem__(self, key):
+        print(key)
         return getattr(self, key)
 
     def __setitem__(self, key, value):
@@ -38,3 +45,20 @@ class Config():
 
     def __repr__(self):
         return self.__dict__.__repr__()
+
+
+def get_config(config_path):
+    with open(config_path, "r") as file:
+        content = file.read()
+    data = json.loads(content)
+    return Config(**data)
+
+
+config = get_config(CONFIG_PATH)
+
+
+if __name__ == "__main__":
+    print(config)
+    # for item in config:
+    #     print(item)
+    breakpoint()

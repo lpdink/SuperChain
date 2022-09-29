@@ -43,7 +43,7 @@ class Logger(logging.Logger):
 
 logging = Logger()
 if __name__ == "__main__":
-    logging.debug("I am debug")  # green
-    logging.info("I am info")  # [time][position] white
-    logging.warning("I am warn")  # yellow
+    logging.debug("I am debug")
+    logging.info("I am info")
+    logging.warning("I am warn")
     logging.error("I am error")

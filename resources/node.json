@@ -1,0 +1,11 @@
+{
+    "objects_group":[
+        {
+            "name":"service_node_group",
+            "clazz":"nodes.Service",
+            "args":{},
+            "nums":64
+        }
+    ],
+    "objects":[]
+}
