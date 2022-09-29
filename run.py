@@ -3,6 +3,13 @@ from nodes import Service
 from common import get_config, logging
 from multiprocessing import Process
 
+# 模拟客户端进程，向每个节点发送msg
+def send_package_to_all_node(port_list):
+    client = Rpc()
+    msg = "I am ping package. "
+    for index, port in enumerate(port_list):
+        target_addr = ("127.0.0.1", port)
+        client.send({"msg": f"{msg} index: {index}"}, target_addr)
 
 def main():
     # 从config中创造node对象
@@ -25,14 +32,7 @@ def main():
         process = Process(target=node.run)
         process_pool.append(process)
 
-    # 模拟客户端进程，向每个节点发送msg
-    def send_package_to_all_node():
-        client = Rpc()
-        msg = "I am ping package. "
-        for index, port in enumerate(port_list):
-            target_addr = ("127.0.0.1", port)
-            client.send({"msg": f"{msg} index: {index}"}, target_addr)
-    client_process = Process(target=send_package_to_all_node)
+    client_process = Process(target=send_package_to_all_node, args=(port_list,))
     process_pool.append(client_process)
 
     # 开始进程

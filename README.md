@@ -20,5 +20,5 @@ python>=3.8
 - resources # 资源
     - config.json # 配置及要创建的对象
     - log/ 存放日志，以时间命名
-- 
+- run # 示例
 ```
