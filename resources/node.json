@@ -1,10 +1,22 @@
 {
     "objects_group":[
         {
-            "name":"service_node_group",
+            "name":"service_group",
             "clazz":"nodes.Service",
             "args":{},
-            "nums":64
+            "nums":3
+        },
+        {
+            "name":"cross_group",
+            "clazz":"nodes.Cross",
+            "args":{},
+            "nums":3
+        },
+        {
+            "name":"super_group",
+            "clazz":"nodes.Super",
+            "args":{},
+            "nums":3
         }
     ],
     "objects":[]
