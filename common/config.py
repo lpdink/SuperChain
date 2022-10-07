@@ -1,10 +1,19 @@
+"""
+Author: lpdink
+Date: 2022-10-07 01:59:10
+LastEditors: lpdink
+LastEditTime: 2022-10-07 10:50:04
+Description: 
+"""
 import json
 import os
-CONFIG_PATH = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), "../resources/config.json")
+
+CONFIG_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "../resources/config.json"
+)
 
 
-class Config():
+class Config:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             if type(v) == dict:

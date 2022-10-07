@@ -1,22 +1,22 @@
-'''
+"""
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-07 03:33:38
+LastEditTime: 2022-10-07 10:50:30
 Description: 
-'''
+"""
 import logging
 import os
 from datetime import datetime
-LOG_DIR = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), "../resources/log")
+
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../resources/log")
 COLOR_DIC = {
-    'ERROR': "31",
-    'INFO': "37",
-    'DEBUG': "34",
-    'WARN': "33",
-    'WARNING': "33",
-    'CRITICAL': "35",
+    "ERROR": "31",
+    "INFO": "37",
+    "DEBUG": "34",
+    "WARN": "33",
+    "WARNING": "33",
+    "CRITICAL": "35",
 }
 
 
@@ -27,7 +27,11 @@ class ColorFormatter(logging.Formatter):
 
     def format(self, record) -> str:
         color = COLOR_DIC[record.levelname]
-        return f"\033[{color}m{super().format(record)}\033[0m" if self.use_color else super().format(record)
+        return (
+            f"\033[{color}m{super().format(record)}\033[0m"
+            if self.use_color
+            else super().format(record)
+        )
 
 
 class Logger(logging.Logger):

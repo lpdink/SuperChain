@@ -1,16 +1,16 @@
-'''
+"""
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
 LastEditTime: 2022-10-07 03:33:26
 Description: 
-'''
+"""
 from framework import Rpc, factory
 from common import config, logging
 
 
 @factory("nodes.Base")
-class Base():
+class Base:
     def __init__(self, addr=None, config=config) -> None:
         print(config)
         self.rpc = Rpc(addr, config.connection)
@@ -32,8 +32,7 @@ class Base():
                 except:
                     data, addr = {}, None
                 if addr is not None:
-                    logging.info(
-                        f"{self.rpc.addr} receive {data} from addr {addr}")
+                    logging.info(f"{self.rpc.addr} receive {data} from addr {addr}")
             except KeyboardInterrupt:
                 self.rpc.close()
 

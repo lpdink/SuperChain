@@ -1,10 +1,10 @@
-'''
+"""
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-07 03:40:51
+LastEditTime: 2022-10-07 10:53:10
 Description: 测试工厂创建对象，节点之间彼此链接并收发包的基础功能
-'''
+"""
 from framework import factory, Rpc
 from nodes import Service
 from common import get_config, logging
@@ -42,8 +42,7 @@ def main():
         process = Process(target=node.run)
         process_pool.append(process)
 
-    client_process = Process(
-        target=send_package_to_all_node, args=(port_list,))
+    client_process = Process(target=send_package_to_all_node, args=(port_list,))
     process_pool.append(client_process)
 
     # 开始进程

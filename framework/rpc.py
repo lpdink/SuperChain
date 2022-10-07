@@ -1,9 +1,16 @@
+"""
+Author: lpdink
+Date: 2022-10-07 01:59:10
+LastEditors: lpdink
+LastEditTime: 2022-10-07 10:51:51
+Description: 
+"""
 from common import logging, config
 import socket
 import json
 
 
-class Rpc():
+class Rpc:
     def __init__(self, addr=None, config=config.connection) -> None:
         # socket.SOCK_DGRAM UDP
         # socket.SOCK_STREAM TCP
@@ -65,6 +72,7 @@ if __name__ == "__main__":
     from common.config import config
     from multiprocessing import Process
     import time
+
     rpc1 = Rpc(("127.0.0.1", 10001), config.connection)
     rpc2 = Rpc(("127.0.0.1", 10002), config.connection)
 
