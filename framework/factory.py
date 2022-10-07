@@ -1,3 +1,10 @@
+"""
+Author: lpdink
+Date: 2022-10-07 01:59:10
+LastEditors: lpdink
+LastEditTime: 2022-10-07 03:33:59
+Description: 支持工厂模式。
+"""
 from common import logging
 import sys
 
@@ -20,18 +27,25 @@ class Factory:
                 self.clazz2name[clazz] = name
             else:
                 logging.error(
-                    f"class already registered with name {self.clazz2name[clazz]}!")
+                    f"class already registered with name {self.clazz2name[clazz]}!"
+                )
                 sys.exit(-1)
             return clazz
+
         return register
+
+    def get(self, obj_name):
+        return self[obj_name]
+
+    def __getitem__(self, key):
+        return self.name2obj.get(key, None)
 
     def create_obj_from_config(self, config):
         if hasattr(config, "objects"):
             for obj in config.objects:
                 clazz = self.name2clazz.get(obj.clazz, None)
                 if clazz is None:
-                    logging.warning(
-                        f"no clazz in {obj}, so it is not instanced")
+                    logging.warning(f"no clazz in {obj}, so it is not instanced")
                     continue
                 # 如果配置了，使用配置的
                 if len(obj.args) > 0:
@@ -46,8 +60,7 @@ class Factory:
             for group in config.objects_group:
                 clazz = self.name2clazz.get(group.clazz, None)
                 if clazz is None:
-                    logging.warning(
-                        f"no clazz in {group}, so they are not instanced")
+                    logging.warning(f"no clazz in {group}, so they are not instanced")
                     continue
                 if len(group.args) > 0:
                     obj_pool = [clazz(**group.args) for _ in range(group.nums)]
@@ -60,7 +73,7 @@ class Factory:
 factory = Factory()
 
 if __name__ == "__main__":
-    '''
+    """
     根据config.json创建对象
-    '''
+    """
     pass

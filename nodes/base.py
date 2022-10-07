@@ -1,3 +1,10 @@
+'''
+Author: lpdink
+Date: 2022-10-07 01:59:10
+LastEditors: lpdink
+LastEditTime: 2022-10-07 03:33:26
+Description: 
+'''
 from framework import Rpc, factory
 from common import config, logging
 
@@ -11,6 +18,10 @@ class Base():
     @property
     def port(self):
         return self.rpc.port
+
+    @property
+    def addr(self):
+        return self.rpc.addr
 
     # 持续接收，打印接收到的数据
     def run(self):

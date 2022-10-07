@@ -1,3 +1,10 @@
+'''
+Author: lpdink
+Date: 2022-10-07 01:59:10
+LastEditors: lpdink
+LastEditTime: 2022-10-07 03:33:38
+Description: 
+'''
 import logging
 import os
 from datetime import datetime
@@ -20,7 +27,7 @@ class ColorFormatter(logging.Formatter):
 
     def format(self, record) -> str:
         color = COLOR_DIC[record.levelname]
-        return f"\033[{color}m{super().format(record)}" if self.use_color else super().format(record)
+        return f"\033[{color}m{super().format(record)}\033[0m" if self.use_color else super().format(record)
 
 
 class Logger(logging.Logger):
