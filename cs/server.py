@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 02:34:16
 LastEditors: lpdink
-LastEditTime: 2022-10-07 07:34:44
+LastEditTime: 2022-10-08 10:08:58
 Description: 后端业务主服务器，用于批量创建及管理节点，监测节点性能。
 """
 from common import logging
@@ -24,7 +24,18 @@ class Server:
         self._service_group = factory["service_group"]
         self._super_group = factory["super_group"]
         self._cross_group = factory["cross_group"]
+        self._all_node_group = self._service_group+self._super_group+self._cross_group
         self._process_pool = []
+        # 将网络情况告知所有节点
+        self.set_network_graph()
+    
+    def set_network_graph(self):
+        service_addrs = [node.addr for node in self._service_group]
+        super_addrs = [node.addr for node in self._super_group]
+        cross_addrs = [node.addr for node in self._cross_group]
+        network = {"service_addrs":service_addrs, "super_addrs":super_addrs, "cross_addrs":cross_addrs}
+        for node in self._all_node_group:
+            node.set_network_graph(network)
 
     @property
     def service(self):
@@ -39,16 +50,9 @@ class Server:
         return random.choice(self._cross_group)
 
     def run(self, behind=False):
-        for service in self._service_group:
-            service_process = Process(target=service.run, daemon=behind)
-            self._process_pool.append(service_process)
-        for super in self._super_group:
-            super_process = Process(target=super.run, daemon=behind)
-            self._process_pool.append(super_process)
-        for cross in self._cross_group:
-            cross_process = Process(target=cross.run, daemon=behind)
-            self._process_pool.append(cross_process)
-
+        for node in self._all_node_group:
+            node_process = Process(target=node.run, daemon=behind)
+            self._process_pool.append(node_process)
         for process in self._process_pool:
             process.start()
         logging.info("Server begin running.")

@@ -3,5 +3,8 @@
         "use_tcp":0,
         "timeout":5,
         "recv_max_bytes":65535
+    },
+    "key":{
+        "pair_key_length":512
     }
 }

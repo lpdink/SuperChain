@@ -2,26 +2,23 @@
 Author: lpdink
 Date: 2022-10-07 02:16:01
 LastEditors: lpdink
-LastEditTime: 2022-10-07 02:16:19
+LastEditTime: 2022-10-08 08:48:45
 Description: 业务链客户端。模拟。
 """
-from framework import Rpc
+from framework import Rpc, Session
 
 
 class Client:
     def __init__(self, addr=None) -> None:
-        # 为None时，随机分配空闲端口
-        self.rpc = Rpc(addr)
-        self.key = None
-
-    def bind(self, service_addr):
-        self.service_addr = service_addr
+        self.addr = addr
 
     def _recv(self):
         return None
 
-    def init_session(self):
-        return None
+    def init_session(self, server_addr):
+        self.session = Session(self.addr, server_addr)
+        # 创建一个session，负责控制init阶段
+        return self.session
 
     def stop_session(self):
         pass

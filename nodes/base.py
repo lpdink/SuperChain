@@ -2,18 +2,25 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-07 03:33:26
+LastEditTime: 2022-10-08 10:07:53
 Description: 
 """
 from framework import Rpc, factory
 from common import config, logging
+import random
 
 
 @factory("nodes.Base")
 class Base:
     def __init__(self, addr=None, config=config) -> None:
-        print(config)
         self.rpc = Rpc(addr, config.connection)
+        # self.network_graph = {}
+
+    def set_network_graph(self, network_graph):
+        self.network_graph = network_graph
+        self._service_addrs = self.network_graph.get("service_addrs", None)
+        self._super_addrs = self.network_graph.get("super_addrs", None)
+        self._cross_addrs = self.network_graph.get("cross_addrs", None)
 
     @property
     def port(self):
@@ -22,6 +29,18 @@ class Base:
     @property
     def addr(self):
         return self.rpc.addr
+
+    @property
+    def service(self):
+        return random.choice(self._service_addrs)
+
+    @property
+    def super(self):
+        return random.choice(self._super_addrs)
+
+    @property
+    def cross(self):
+        return random.choice(self._cross_addrs)
 
     # 持续接收，打印接收到的数据
     def run(self):
