@@ -2,11 +2,12 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-08 10:07:53
-Description: 
+LastEditTime: 2022-10-10 07:23:03
+Description: 基类节点
 """
 from framework import Rpc, factory
 from common import config, logging
+from utils import value_dispatch
 import random
 
 
@@ -21,6 +22,9 @@ class Base:
         self._service_addrs = self.network_graph.get("service_addrs", None)
         self._super_addrs = self.network_graph.get("super_addrs", None)
         self._cross_addrs = self.network_graph.get("cross_addrs", None)
+
+    def handle_msg(self, type, msg, addr):
+        raise NotImplementedError("handle_msg should rewrite in sub-class")
 
     @property
     def port(self):
@@ -51,7 +55,11 @@ class Base:
                 except:
                     data, addr = {}, None
                 if addr is not None:
-                    logging.info(f"{self.rpc.addr} receive {data} from addr {addr}")
+                    if isinstance(data, dict):
+                        msg_type = data["type"]
+                        msg = data
+                        self.handle_msg(msg_type, msg, addr)
+                    # logging.info(f"{self.rpc.addr} receive {data} from addr {addr}")
             except KeyboardInterrupt:
                 self.rpc.close()
 

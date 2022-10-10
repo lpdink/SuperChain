@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-07 03:33:59
+LastEditTime: 2022-10-10 08:35:51
 Description: 支持工厂模式。
 """
 from common import logging

@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 02:34:16
 LastEditors: lpdink
-LastEditTime: 2022-10-08 10:08:58
+LastEditTime: 2022-10-10 08:36:18
 Description: 后端业务主服务器，用于批量创建及管理节点，监测节点性能。
 """
 from common import logging
@@ -14,7 +14,7 @@ import random
 class Server:
     _instance = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, config, *args, **kw):
         if cls._instance is None:
             cls._instance = object.__new__(cls, *args, **kw)
         return cls._instance

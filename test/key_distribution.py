@@ -2,14 +2,15 @@
 Author: lpdink
 Date: 2022-10-07 02:00:21
 LastEditors: lpdink
-LastEditTime: 2022-10-08 08:43:05
+LastEditTime: 2022-10-10 08:35:33
 Description: TDD:密钥分发的测试程序，将打印客户端与参与session的super节点的密钥。
 """
+from nodes import *
 from cs import Client, Server
 from common import get_config, logging
 
 if __name__ == "__main__":
-    obj_config = get_config("../resources/node.json")
+    obj_config = get_config("./resources/node.json")
     server = Server(obj_config)
     server.run(behind=True)
     client = Client()
@@ -18,10 +19,7 @@ if __name__ == "__main__":
     # client.bind(server.service.addr)
     session = client.init_session(server.service.addr)
     logging.warning(
-        f"rsa key from client:{client.key}\nrsa key from super:{session.server.key}"
-    )
-    logging.warning(
-        f"client.key==session.server.key? : {client.key == session.server.key}"
+        f"rsa key from client:{client.key}"
     )
     client.stop_session()
     client.exit()

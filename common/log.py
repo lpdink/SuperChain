@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-07 10:50:30
+LastEditTime: 2022-10-10 08:33:23
 Description: 
 """
 import logging
@@ -38,7 +38,7 @@ class Logger(logging.Logger):
     def __init__(self, name="log", level=0) -> None:
         super().__init__(name, level)
         stream_handler = logging.StreamHandler()
-        fmt = "[%(asctime)s %(levelname)s %(pathname)s at line %(lineno)d] %(message)s"
+        fmt = "[%(asctime)s %(levelname)s %(pathname)s:%(lineno)d] %(message)s"
         color_formater = ColorFormatter(fmt, True)
         stream_handler.setFormatter(color_formater)
         if not os.path.isdir(LOG_DIR):
