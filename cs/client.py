@@ -27,6 +27,5 @@ class Client:
     def stop_session(self):
         self.session.c_rpc.close()
 
-
     def exit(self):
         del self

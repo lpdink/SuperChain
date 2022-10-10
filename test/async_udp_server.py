@@ -14,8 +14,8 @@ class EchoServerProtocol:
 
     def datagram_received(self, data, addr):
         message = data.decode()
-        print('Received %r from %s' % (message, addr))
-        print('Send %r to %s' % (message, addr))
+        print("Received %r from %s" % (message, addr))
+        print("Send %r to %s" % (message, addr))
         self.transport.sendto(data, addr)
 
 
@@ -29,8 +29,8 @@ async def main():
     # One protocol instance will be created to serve all
     # client requests.
     transport, protocol = await loop.create_datagram_endpoint(
-        lambda: EchoServerProtocol(),
-        local_addr=('127.0.0.1', 9999))
+        lambda: EchoServerProtocol(), local_addr=("127.0.0.1", 9999)
+    )
 
     try:
         await asyncio.sleep(3600)  # Serve for 1 hour.

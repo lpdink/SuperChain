@@ -20,7 +20,7 @@ class EchoClientProtocol:
 
     def connection_made(self, transport):
         self.transport = transport
-        print('Send:', self.message)
+        print("Send:", self.message)
         self.transport.sendto(self.message.encode())
 
     def datagram_received(self, data, addr):
@@ -30,7 +30,7 @@ class EchoClientProtocol:
         self.transport.close()
 
     def error_received(self, exc):
-        print('Error received:', exc)
+        print("Error received:", exc)
 
     def connection_lost(self, exc):
         print("Connection closed")
@@ -47,7 +47,8 @@ async def main():
 
     transport, protocol = await loop.create_datagram_endpoint(
         lambda: EchoClientProtocol(message, on_con_lost),
-        remote_addr=('127.0.0.1', 9999))
+        remote_addr=("127.0.0.1", 9999),
+    )
 
     try:
         await on_con_lost

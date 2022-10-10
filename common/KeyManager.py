@@ -13,9 +13,9 @@ from common import config
 class KeyManager:
     @staticmethod
     def generate_pair():
-        pub,priv=rsa.newkeys(config.key.pair_key_length)
-        pub = {"pub-n":pub.n, "pub-e":pub.e}
-        return pub,priv
+        pub, priv = rsa.newkeys(config.key.pair_key_length)
+        pub = {"pub-n": pub.n, "pub-e": pub.e}
+        return pub, priv
 
     @staticmethod
     def generate_key():

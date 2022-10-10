@@ -33,14 +33,14 @@ class Cross(Base):
             self.service2super[addr] = super
             self.super2service[super] = addr
         self.rpc.send(msg, super)
-        logging.info(f"cross node {self.addr} handle msg {type} forward package to super {super}")
+        logging.info(
+            f"cross node {self.addr} handle msg {type} forward package to super {super}"
+        )
 
     @handle_msg.register(Msg.INIT_SEESION_RESPONSE)
     def _(self, type, msg, addr):
         # 转发包体
         self.rpc.send(msg, self.service)
-
-    
 
 
 if __name__ == "__main__":

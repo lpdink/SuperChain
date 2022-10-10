@@ -71,11 +71,12 @@ def value_dispatch(func):
         def wrap(func):
             if value in registry:
                 raise ValueError(
-                    f'@value_dispatch: there is already a handler '
-                    f'registered for {value!r}'
+                    f"@value_dispatch: there is already a handler "
+                    f"registered for {value!r}"
                 )
             registry[value] = func
             return func
+
         return wrap
 
     def register_for_all(values):
@@ -83,11 +84,12 @@ def value_dispatch(func):
             for value in values:
                 if value in registry:
                     raise ValueError(
-                        f'@value_dispatch: there is already a handler '
-                        f'registered for {value!r}'
+                        f"@value_dispatch: there is already a handler "
+                        f"registered for {value!r}"
                     )
                 registry[value] = func
             return func
+
         return wrap
 
     wrapper.register = register

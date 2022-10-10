@@ -18,10 +18,7 @@ if __name__ == "__main__":
     # 故client选取了server提供的一个随机service节点
     # client.bind(server.service.addr)
     session = client.init_session(server.service.addr)
-    logging.warning(
-        f"rsa key from client:{client.key}"
-    )
+    logging.warning(f"rsa key from client:{client.key}")
     client.stop_session()
     client.exit()
     server.shut_down()
-

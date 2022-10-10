@@ -35,12 +35,11 @@ class Super(Base):
         encrypt_key = KeyManager.encrypt_with_pub(key, pub_key)
         self.rpc.send(
             {
-                "type":Msg.INIT_SEESION_RESPONSE,
-                "encrypt-key":encrypt_key.hex(), # to string, 以使其能被json化
-                "client-addr":client_addr
+                "type": Msg.INIT_SEESION_RESPONSE,
+                "encrypt-key": encrypt_key.hex(),  # to string, 以使其能被json化
+                "client-addr": client_addr,
             },
-            addr
+            addr,
         )
         self.client2key[tuple(client_addr)] = key
         logging.info(f"super {self.addr} generate key {key}")
-

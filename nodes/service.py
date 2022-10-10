@@ -15,8 +15,8 @@ from common import config, logging
 class Service(Base):
     def __init__(self, addr=None, config=config) -> None:
         super().__init__(addr, config)
-        self.client2cross=dict()
-        self.cross2client=dict()
+        self.client2cross = dict()
+        self.cross2client = dict()
 
     @value_dispatch
     def handle_msg(self, type, msg, addr):
@@ -33,7 +33,9 @@ class Service(Base):
             self.client2cross[addr] = cross
             self.cross2client[cross] = addr
         self.rpc.send(msg, cross)
-        logging.info(f"service node {self.addr} handle msg {type} forward package to cross {cross}")
+        logging.info(
+            f"service node {self.addr} handle msg {type} forward package to cross {cross}"
+        )
 
     @handle_msg.register(Msg.INIT_SEESION_RESPONSE)
     def _(self, type, msg, addr):

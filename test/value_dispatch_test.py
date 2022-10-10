@@ -8,6 +8,7 @@ value_dispatch装饰器无法被继承。在子类不可见(不清楚原因)，�
 """
 from utils import value_dispatch
 
+
 class Base:
     def __init__(self) -> None:
         pass
@@ -24,7 +25,8 @@ class Base:
     @handle_msg.register("error")
     def _(self, msg_type, msg):
         print(f"the msg {msg} is error")
-        
+
+
 class SubBase(Base):
     def __init__(self) -> None:
         super().__init__()
@@ -43,7 +45,8 @@ class SubBase(Base):
     def _(self, msg_type, msg):
         print(f"the msg {msg} is error in sub class")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     base = Base()
     base.handle_msg("info", "no bug in your code.")
     base.handle_msg("error", "many bugs in your code!")

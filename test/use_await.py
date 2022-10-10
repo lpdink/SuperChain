@@ -21,6 +21,7 @@ async def test():
     print("test!")
     await asyncio.sleep(1)
 
+
 loop = asyncio.get_event_loop()
 tasks = [receive(), send()]
 loop.run_until_complete(asyncio.wait(tasks))

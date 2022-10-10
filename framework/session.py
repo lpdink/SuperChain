@@ -28,9 +28,13 @@ class Session:
             # self.key = response["key"]
             encrypt_key = response.get("encrypt-key", None)
             if encrypt_key is None:
-                logging.error("INIT_SESSION_RESPONSE without section encrypt-key, initsession failed.")
+                logging.error(
+                    "INIT_SESSION_RESPONSE without section encrypt-key, initsession failed."
+                )
                 return
-            self.key = KeyManager.decrypt_with_rsa(bytes.fromhex(encrypt_key), self.priv)
+            self.key = KeyManager.decrypt_with_rsa(
+                bytes.fromhex(encrypt_key), self.priv
+            )
             logging.info(f"client receive key {self.key}")
 
     def _sent_pair_key_to_server(self):
@@ -56,4 +60,3 @@ class Session:
                     return data, addr
             except KeyboardInterrupt:
                 self.c_rpc.close()
-
