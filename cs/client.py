@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 02:16:01
 LastEditors: lpdink
-LastEditTime: 2022-10-10 09:29:00
+LastEditTime: 2022-10-13 08:31:44
 Description: 业务链客户端。模拟。
 """
 from common import logging
@@ -28,4 +28,9 @@ class Client:
         self.session.c_rpc.close()
 
     def exit(self):
-        del self
+        self.session.c_rpc.close()
+
+    def commit(self, log):
+        client_id, log_id = self.session.commit(log)
+        logging.warning(f"commit {log} success, client_id:{client_id} log_id:{log_id}")
+        return client_id, log_id

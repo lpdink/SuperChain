@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-10 09:04:21
+LastEditTime: 2022-10-13 09:20:46
 Description: 
 """
 from common import logging, config
@@ -47,7 +47,7 @@ class Rpc:
 
     def set_timeout(self, timeout):
         self.sk.settimeout(timeout)
-        logging.info(f"addr {self.addr} set timeout {timeout}")
+        # logging.info(f"addr {self.addr} set timeout {timeout}")
 
     def send(self, data, addr):
         data = json.dumps(data).encode("utf-8")
@@ -56,7 +56,7 @@ class Rpc:
             self.sk.sendall(data)
         else:
             self.sk.sendto(data, tuple(addr))
-            logging.info(f"{self.addr} node send {data} to {addr}")
+            logging.info(f"{self.addr} node send {data} to {tuple(addr)}")
 
     def recv(self):
         recv_max_bytes = self.config.get("recv_max_bytes", 65535)

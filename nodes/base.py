@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-10 07:23:03
+LastEditTime: 2022-10-13 06:49:44
 Description: 基类节点
 """
 from framework import Rpc, factory
@@ -46,7 +46,7 @@ class Base:
     def cross(self):
         return random.choice(self._cross_addrs)
 
-    # 持续接收，打印接收到的数据
+    # 持续接收，并根据策略处理
     def run(self):
         while True:
             try:
