@@ -29,3 +29,11 @@ pip install -r requirements.txt
     - connect：工厂创建节点及互相发包的RPC基础测试
     - key_distribution：TDD完成，密钥分发测试。
     - commit_log：TDD完成，日志提交测试。
+## Usage
+```
+source env.sh
+
+python test/commit_log.py  # 日志提交测试
+python test/key_distribution.py # 密钥分发测试
+python test/connect.py # 工厂模式与udp链接测试
+```
