@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-13 09:11:14
+LastEditTime: 2022-10-20 08:19:26
 Description: 业务链节点
 """
 import json
@@ -109,8 +109,18 @@ class Service(Base):
         self.commit2flag[commit_id] += 1
         if self.commit2flag[commit_id] == len(self._service_addrs):
             c_addr, log_id = commit_id.split("|")
+            log = self.log_repo[c_addr][log_id]
             addr, port = c_addr.split(",")
             c_addr = (addr, int(port))
+            # 将包发送给super以供给监察
+            cross = self.cross
+            self.rpc.send({
+                "type":Msg.SERVICE_FORWARD_TO_SUPER,
+                "client_id": c_addr,
+                "log": log,
+            }, cross)
+            logging.warning(f"service send {Msg.SERVICE_FORWARD_TO_SUPER} to {cross}")
+
             self.rpc.send(
                 {
                     "type": Msg.CLIENT_COMMIT_LOG_RESPONSE,
