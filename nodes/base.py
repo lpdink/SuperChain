@@ -5,23 +5,24 @@ LastEditors: lpdink
 LastEditTime: 2022-10-13 06:49:44
 Description: 基类节点
 """
-from framework import Rpc, factory
-from common import config, logging
-from utils import value_dispatch
 import random
+
+from common import config, logging
+from framework import Rpc, factory
+from utils import value_dispatch
 
 
 @factory("nodes.Base")
 class Base:
     def __init__(self, addr=None, config=config) -> None:
         self.rpc = Rpc(addr, config.connection)
-        # self.network_graph = {}
 
     def set_network_graph(self, network_graph):
         self.network_graph = network_graph
         self._service_addrs = self.network_graph.get("service_addrs", None)
         self._super_addrs = self.network_graph.get("super_addrs", None)
         self._cross_addrs = self.network_graph.get("cross_addrs", None)
+        self.center = self.network_graph.get("center_addrs", None)[0]
 
     def handle_msg(self, type, msg, addr):
         raise NotImplementedError("handle_msg should rewrite in sub-class")

@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-10 09:34:33
 LastEditors: lpdink
-LastEditTime: 2022-10-10 09:44:10
+LastEditTime: 2022-10-24 02:56:26
 Description: 以black格式化代码
 """
 import os
@@ -23,4 +23,5 @@ if __name__ == "__main__":
     base = os.path.realpath("./")
     find_all_py(base, py_files)
     py_files = " ".join(py_files)
+    os.system("isort .")
     os.system(f"black {py_files}")

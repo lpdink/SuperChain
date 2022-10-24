@@ -5,9 +5,10 @@ LastEditors: lpdink
 LastEditTime: 2022-10-13 09:20:46
 Description: 
 """
-from common import logging, config
-import socket
 import json
+import socket
+
+from common import config, logging
 
 
 class Rpc:
@@ -69,9 +70,10 @@ class Rpc:
 
 if __name__ == "__main__":
     # logging.info("in rpc")
-    from common.config import config
-    from multiprocessing import Process
     import time
+    from multiprocessing import Process
+
+    from common.config import config
 
     rpc1 = Rpc(("127.0.0.1", 10001), config.connection)
     rpc2 = Rpc(("127.0.0.1", 10002), config.connection)

@@ -5,10 +5,11 @@ LastEditors: lpdink
 LastEditTime: 2022-10-07 10:53:10
 Description: 测试工厂创建对象，节点之间彼此链接并收发包的基础功能
 """
-from framework import factory, Rpc
-from nodes import Service
-from common import get_config, logging
 from multiprocessing import Process
+
+from common import get_config, logging
+from framework import Rpc, factory
+from nodes import Service
 
 # 模拟客户端进程，向每个节点发送msg
 

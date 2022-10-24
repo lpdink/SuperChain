@@ -5,9 +5,9 @@ LastEditors: lpdink
 LastEditTime: 2022-10-10 08:35:33
 Description: TDD:密钥分发的测试程序，将打印客户端与参与session的super节点的密钥。
 """
-from nodes import *
-from cs import Client, Server
 from common import get_config, logging
+from cs import Client, Server
+from nodes import *
 
 if __name__ == "__main__":
     obj_config = get_config("./resources/node.json")
