@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-24 04:08:23
+LastEditTime: 2022-10-24 06:12:08
 Description: 监管链节点
 """
 from common import KeyManager, config, logging
@@ -46,10 +46,10 @@ class Super(Base):
             # NOTE:log_id的计算与service耦合。
             log_id = sha256(encrypt_log.hex())
             log = KeyManager.decrypt(encrypt_log, key).decode("utf-8")
-            is_risk = self.supervise(log)
-            logging.info(f"[Super] supervise log:{log}, is risk? {is_risk}")
-            if is_risk:
-                logging.warning(f"log {log} is risk! Prepare to delete it.")
+            is_risky = self.supervise(log)
+            logging.info(f"[Super] supervise log:{log}, is risky? {is_risky}")
+            if is_risky:
+                logging.warning(f"log {log} is risky! Prepare to delete it.")
                 self.rpc.send(
                     {
                         "type": Msg.SUPER_DELETE_TO_SERVICE,

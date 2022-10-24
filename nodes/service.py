@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-24 03:58:40
+LastEditTime: 2022-10-24 06:23:48
 Description: 业务链节点
 """
 import json
@@ -115,6 +115,16 @@ class Service(Base):
             log = self.log_repo[c_addr][log_id]
             addr, port = c_addr.split(",")
             c_addr = (addr, int(port))
+            self.rpc.send(
+                {
+                    "type": Msg.CLIENT_COMMIT_LOG_RESPONSE,
+                    "client_id": c_addr,
+                    "log_id": log_id,
+                },
+                c_addr,
+            )
+            self.commit2flag.pop(commit_id)
+            logging.info(f"client {c_addr} log {log_id} commited")
             # 将包发送给super以供给监察
             cross = self.cross
             self.rpc.send(
@@ -127,17 +137,41 @@ class Service(Base):
             )
             logging.warning(f"service send {Msg.SERVICE_FORWARD_TO_SUPER} to {cross}")
 
-            self.rpc.send(
-                {
-                    "type": Msg.CLIENT_COMMIT_LOG_RESPONSE,
-                    "client_id": c_addr,
-                    "log_id": log_id,
-                },
-                c_addr,
-            )
-            self.commit2flag.pop(commit_id)
-            logging.info(f"client {c_addr} log {log_id} commited")
-
     @handle_msg.register(Msg.SUPER_DELETE_TO_SERVICE)
     def _(self, type, msg, addr):
-        logging.warning("[service] receive delete request from super.")
+        # logging.warning("[service] receive delete request from super.")
+        client_id, log_id = self.parse_client_id(msg["client_id"]), msg["log_id"]
+        # if self.log_repo[]
+        if (
+            client_id in self.log_repo.keys()
+            and log_id in self.log_repo[client_id].keys()
+        ):
+            logging.warning("[service] find risky log, deleting.")
+            self.log_repo[client_id].pop(log_id)
+        else:
+            logging.warning("[service] can't find risky log, pass.")
+        # 遍历其他service节点，要求他们删除该风险日志
+        for s_addr in self._service_addrs:
+            if s_addr != self.addr:
+                self.rpc.send(
+                    {
+                        "type": Msg.SERVICE_DELETE_TO_SERVICE,
+                        "client_id": msg["client_id"],
+                        "log_id": msg["log_id"],
+                    },
+                    s_addr,
+                )
+
+    @handle_msg.register(Msg.SERVICE_DELETE_TO_SERVICE)
+    def _(self, type, msg, addr):
+        # logging.warning("[service] receive delete request from super.")
+        client_id, log_id = self.parse_client_id(msg["client_id"]), msg["log_id"]
+        # if self.log_repo[]
+        if (
+            client_id in self.log_repo.keys()
+            and log_id in self.log_repo[client_id].keys()
+        ):
+            logging.warning("[service] find risky log, deleting.")
+            self.log_repo[client_id].pop(log_id)
+        else:
+            logging.warning("[service] can't find risky log, pass.")
