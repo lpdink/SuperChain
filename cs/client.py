@@ -5,7 +5,6 @@ LastEditors: lpdink
 LastEditTime: 2022-10-13 08:31:44
 Description: 业务链客户端。模拟。
 """
-from client.superChain import Window
 from common import logging
 from framework import Rpc, Session
 
@@ -22,8 +21,8 @@ class Client:
         self.session = Session(self.addr, server_addr)
         logging.info("session created, begin init")
         # 创建一个session，负责控制init阶段
-        self.session.init()
-        return self.session
+        key = self.session.init()
+        return key
 
     def stop_session(self):
         self.session.c_rpc.close()

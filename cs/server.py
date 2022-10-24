@@ -74,3 +74,9 @@ class Server:
         for process in self._process_pool:
             process.terminate()
         logging.info("Server shutdown.")
+
+    def show_service_addr(self):
+        service_addrs = "; ".join([str(node.addr[1]) for node in self._service_group])
+        logging.warning(
+            f"all service port, choose anyone for your client:{service_addrs}"
+        )

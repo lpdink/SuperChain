@@ -36,6 +36,7 @@ class Session:
                 bytes.fromhex(encrypt_key), self.priv
             )
             logging.info(f"client receive key {self.key}")
+        return self.key
 
     def _sent_pair_key_to_server(self):
         # breakpoint()
