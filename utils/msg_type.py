@@ -20,7 +20,6 @@ class Msg:
     SUPER_SEARCH_KEY_RESPONSE = 1010
 
 
-
 if __name__ == "__main__":
     import json
 

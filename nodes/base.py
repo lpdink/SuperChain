@@ -5,10 +5,11 @@ LastEditors: lpdink
 LastEditTime: 2022-10-13 06:49:44
 Description: 基类节点
 """
-from framework import Rpc, factory
-from common import config, logging
-from utils import value_dispatch
 import random
+
+from common import config, logging
+from framework import Rpc, factory
+from utils import value_dispatch
 
 
 @factory("nodes.Base")

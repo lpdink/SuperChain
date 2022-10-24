@@ -5,9 +5,9 @@ LastEditors: lpdink
 LastEditTime: 2022-10-13 08:31:44
 Description: 业务链客户端。模拟。
 """
+from client.superChain import Window
 from common import logging
 from framework import Rpc, Session
-from client.superChain import Window
 
 
 class Client:

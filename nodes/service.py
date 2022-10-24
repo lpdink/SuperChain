@@ -7,10 +7,10 @@ Description: 业务链节点
 """
 import json
 
-from nodes.base import Base
-from utils import value_dispatch, Msg, sha256
-from framework import factory
 from common import config, logging
+from framework import factory
+from nodes.base import Base
+from utils import Msg, sha256, value_dispatch
 
 
 @factory("nodes.Service")
@@ -117,11 +117,14 @@ class Service(Base):
             c_addr = (addr, int(port))
             # 将包发送给super以供给监察
             cross = self.cross
-            self.rpc.send({
-                "type":Msg.SERVICE_FORWARD_TO_SUPER,
-                "client_id": c_addr,
-                "log": log,
-            }, cross)
+            self.rpc.send(
+                {
+                    "type": Msg.SERVICE_FORWARD_TO_SUPER,
+                    "client_id": c_addr,
+                    "log": log,
+                },
+                cross,
+            )
             logging.warning(f"service send {Msg.SERVICE_FORWARD_TO_SUPER} to {cross}")
 
             self.rpc.send(
@@ -134,7 +137,7 @@ class Service(Base):
             )
             self.commit2flag.pop(commit_id)
             logging.info(f"client {c_addr} log {log_id} commited")
-    
+
     @handle_msg.register(Msg.SUPER_DELETE_TO_SERVICE)
     def _(self, type, msg, addr):
         logging.warning("[service] receive delete request from super.")

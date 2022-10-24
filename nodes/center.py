@@ -5,10 +5,11 @@ LastEditors: lpdink
 LastEditTime: 2022-10-24 03:59:38
 Description: 密钥中心节点，单例。
 """
-from nodes.base import Base
+from common import KeyManager, config, logging
 from framework import factory
-from common import config, logging, KeyManager
-from utils import value_dispatch, Msg
+from nodes.base import Base
+from utils import Msg, value_dispatch
+
 
 @factory("nodes.Center")
 class Center(Base):
@@ -63,6 +64,15 @@ class Center(Base):
         client_id = tuple(msg["client_id"])
         key = self.client2key.get(client_id, None)
         if key is not None:
-            self.rpc.send({"type":Msg.SUPER_SEARCH_KEY_RESPONSE, "key":key.hex(), "client_id":client_id}, addr)
+            self.rpc.send(
+                {
+                    "type": Msg.SUPER_SEARCH_KEY_RESPONSE,
+                    "key": key.hex(),
+                    "client_id": client_id,
+                },
+                addr,
+            )
         else:
-            logging.warning(f"[center] client_id {client_id} not in self.client2key, search failed.")
+            logging.warning(
+                f"[center] client_id {client_id} not in self.client2key, search failed."
+            )

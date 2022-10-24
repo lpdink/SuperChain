@@ -5,8 +5,9 @@ LastEditors: lpdink
 LastEditTime: 2022-10-10 08:35:51
 Description: 支持工厂模式。
 """
-from common import logging
 import sys
+
+from common import logging
 
 
 class Factory:

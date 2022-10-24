@@ -5,17 +5,17 @@ LastEditors: lpdink
 LastEditTime: 2022-10-24 04:08:23
 Description: 监管链节点
 """
-from nodes.base import Base
+from common import KeyManager, config, logging
 from framework import factory
-from common import config, logging, KeyManager
-from utils import Msg, value_dispatch, sha256
+from nodes.base import Base
+from utils import Msg, sha256, value_dispatch
 
 
 @factory("nodes.Super")
 class Super(Base):
     def __init__(self, addr=None, config=config) -> None:
         super().__init__(addr, config)
-        self.to_supervise_pool=dict()
+        self.to_supervise_pool = dict()
 
     @value_dispatch
     def handle_msg(self, type, msg, addr):
@@ -32,8 +32,10 @@ class Super(Base):
         else:
             self.to_supervise_pool[client_id].append(encrypt_log)
         # 向密钥中心查询该client_id的key
-        self.rpc.send({"type":Msg.SUPER_SEARCH_KEY_REQUEST, "client_id":client_id}, self.center)
-    
+        self.rpc.send(
+            {"type": Msg.SUPER_SEARCH_KEY_REQUEST, "client_id": client_id}, self.center
+        )
+
     @handle_msg.register(Msg.SUPER_SEARCH_KEY_RESPONSE)
     def _(self, type, msg, addr):
         client_id = tuple(msg["client_id"])
@@ -43,12 +45,19 @@ class Super(Base):
         for encrypt_log in encrypt_logs:
             # NOTE:log_id的计算与service耦合。
             log_id = sha256(encrypt_log.hex())
-            log = KeyManager.decrypt(encrypt_log,key).decode("utf-8")
+            log = KeyManager.decrypt(encrypt_log, key).decode("utf-8")
             is_risk = self.supervise(log)
             logging.info(f"[Super] supervise log:{log}, is risk? {is_risk}")
             if is_risk:
                 logging.warning(f"log {log} is risk! Prepare to delete it.")
-                self.rpc.send({"type":Msg.SUPER_DELETE_TO_SERVICE, "client_id":client_id, "log_id":log_id}, self.cross)
+                self.rpc.send(
+                    {
+                        "type": Msg.SUPER_DELETE_TO_SERVICE,
+                        "client_id": client_id,
+                        "log_id": log_id,
+                    },
+                    self.cross,
+                )
 
     def supervise(self, msg):
         # 返回信息是否敏感

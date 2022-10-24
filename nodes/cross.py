@@ -5,10 +5,10 @@ LastEditors: lpdink
 LastEditTime: 2022-10-24 03:54:15
 Description: 跨链节点
 """
-from nodes.base import Base
-from framework import factory
 from common import config, logging
-from utils import value_dispatch, Msg
+from framework import factory
+from nodes.base import Base
+from utils import Msg, value_dispatch
 
 
 @factory("nodes.Cross")
