@@ -39,9 +39,10 @@ class Window:
         # 打开日志文件
         def open_log_file():
             file_path=filedialog.askopenfilename()
-            with open(file_path, "r", encoding="utf-8") as file:
-                content = file.read()+"\n"
-            to_commit_log_area.insert("end", content)
+            if file_path is not None:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    content = file.read()+"\n"
+                to_commit_log_area.insert("end", content)
         open_log_button = tk.Button(input_frame, text="打开日志文件", border=5, borderwidth=5, command=open_log_file)
         open_log_button.grid(row=2, column=0, sticky=tk.NW)
         log_frame = tk.LabelFrame(self.root,text="Log",font=("黑体",12),borderwidth=5,width=LOG_WIDTH)
@@ -53,6 +54,10 @@ class Window:
         # 提交
         submit_button = tk.Button(input_frame, text="提交",border=5, borderwidth=5, command=commit)
         submit_button.grid(row=2, column=1, sticky=tk.NW)
+        self.log_area=log_area
+
+    def set_log(self, content):
+        self.log_area.insert("end", content+"\n")
 
 
     def run(self):

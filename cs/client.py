@@ -7,6 +7,7 @@ Description: 业务链客户端。模拟。
 """
 from common import logging
 from framework import Rpc, Session
+from client.superChain import Window
 
 
 class Client:

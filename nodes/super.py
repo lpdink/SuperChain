@@ -23,29 +23,6 @@ class Super(Base):
         logging.error(f"unexpected msg type:{type} with msg:{msg}, please check.")
         return False
 
-    @handle_msg.register(Msg.INIT_SESSION_REQUEST)
-    def _(self, type, msg, addr):
-        pub_key = msg.get("client-pub", None)
-        client_addr = msg.get("client-addr", None)
-        if pub_key is None:
-            logging.error(f"{type} have not client-pub section. Handle msg failed.")
-            return False
-        if client_addr is None:
-            logging.error(f"{type} have not client-addr section. Handle msg failed.")
-        key = KeyManager.generate_key()
-        encrypt_key = KeyManager.encrypt_with_pub(key, pub_key)
-        self.client2key[tuple(client_addr)] = key
-        logging.info(f"super {self.addr} generate key {key}")
-        self.rpc.send(
-            {
-                "type": Msg.INIT_SEESION_RESPONSE,
-                "encrypt-key": encrypt_key.hex(),  # to string, 以使其能被json化
-                "client-addr": client_addr,
-            },
-            addr,
-        )
-        # 将key广播给其他监管链节点
-
     @handle_msg.register(Msg.SERVICE_FORWARD_TO_SUPER)
     def _(self, type, msg, addr):
         client_id = tuple(msg["client_id"])

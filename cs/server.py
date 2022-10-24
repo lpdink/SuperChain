@@ -24,8 +24,11 @@ class Server:
         self._service_group = factory["service_group"]
         self._super_group = factory["super_group"]
         self._cross_group = factory["cross_group"]
+        self._center = factory["center"]
+        if not isinstance(self._center, list):
+            self._center = [self._center]
         self._all_node_group = (
-            self._service_group + self._super_group + self._cross_group
+            self._service_group + self._super_group + self._cross_group+self._center
         )
         self._process_pool = []
         # 将网络情况告知所有节点
@@ -35,10 +38,13 @@ class Server:
         service_addrs = [node.addr for node in self._service_group]
         super_addrs = [node.addr for node in self._super_group]
         cross_addrs = [node.addr for node in self._cross_group]
+        center_addrs = [node.addr for node in self._center]
+        assert len(center_addrs)==1
         network = {
             "service_addrs": service_addrs,
             "super_addrs": super_addrs,
             "cross_addrs": cross_addrs,
+            "center_addrs":center_addrs
         }
         for node in self._all_node_group:
             node.set_network_graph(network)
