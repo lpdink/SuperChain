@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-07 01:59:10
 LastEditors: lpdink
-LastEditTime: 2022-10-20 08:19:26
+LastEditTime: 2022-10-24 03:58:40
 Description: 业务链节点
 """
 import json
@@ -21,6 +21,9 @@ class Service(Base):
         self.cross2client = dict()
         self.log_repo = dict()  # 日志的存储位置
         self.commit2flag = dict()  # 标识已上链的节点数量，用于判断日志是否在全部节点上链
+
+    def parse_client_id(self, res):
+        return ",".join([str(item) for item in res])
 
     @value_dispatch
     def handle_msg(self, type, msg, addr):
@@ -56,7 +59,7 @@ class Service(Base):
         向其他业务链节点发起SERVICE_COMMIT_LOG_REQUEST
         """
         # msg["client_id"]类似["127.0.0.1", 23456],这里将其str为"127.0.0.1,23456"
-        client_id, log = ",".join([str(item) for item in msg["client_id"]]), msg["log"]
+        client_id, log = self.parse_client_id(msg["client_id"]), msg["log"]
         log_id = sha256(log)
         if client_id not in self.log_repo.keys():
             self.log_repo[client_id] = {log_id: log}
@@ -83,7 +86,7 @@ class Service(Base):
         将日志上链，返回SERVICE_COMMIT_LOG_RESPONSE
         """
         # msg["client_id"]类似["127.0.0.1", 23456],这里将其str为"127.0.0.1,23456"
-        client_id, log = ",".join([str(item) for item in msg["client_id"]]), msg["log"]
+        client_id, log = self.parse_client_id(msg["client_id"]), msg["log"]
         log_id = sha256(log)
         commit_id = "|".join([client_id, log_id])
         if client_id not in self.log_repo.keys():
@@ -131,3 +134,7 @@ class Service(Base):
             )
             self.commit2flag.pop(commit_id)
             logging.info(f"client {c_addr} log {log_id} commited")
+    
+    @handle_msg.register(Msg.SUPER_DELETE_TO_SERVICE)
+    def _(self, type, msg, addr):
+        logging.warning("[service] receive delete request from super.")
