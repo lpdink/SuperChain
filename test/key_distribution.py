@@ -7,7 +7,7 @@ Description: TDD:密钥分发的测试程序，将打印客户端与参与sessio
 """
 from common import get_config, logging
 from cs import Client, Server
-from nodes import *
+from protocols import *
 
 if __name__ == "__main__":
     obj_config = get_config("./resources/node.json")

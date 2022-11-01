@@ -1,30 +1,20 @@
 """
 Author: lpdink
-Date: 2022-10-24 02:50:38
+Date: 2022-10-28 08:21:50
 LastEditors: lpdink
-LastEditTime: 2022-10-24 03:59:38
-Description: 密钥中心节点，单例。
+LastEditTime: 2022-10-28 09:29:48
+Description: 
 """
 from common import KeyManager, config, logging
-from framework import factory
-from nodes.base import Base
 from utils import Msg, value_dispatch
 
+from .base import BaseProtocol
+from .node import nodefactory
 
-@factory("nodes.Center")
-class Center(Base):
-    _instance = None
 
-    def __new__(cls, addr=None, config=config, *args, **kw):
-        if cls._instance is None:
-            cls._instance = object.__new__(cls, *args, **kw)
-        else:
-            logging.error("class Center is singleton, should be instanced only once.")
-            exit(-1)
-        return cls._instance
-
-    def __init__(self, addr=None, config=config) -> None:
-        super().__init__(addr, config)
+@nodefactory("protocols.Center")
+class CenterProtocol(BaseProtocol):
+    def __init__(self) -> None:
         self.client2key = dict()
 
     @value_dispatch
@@ -50,7 +40,7 @@ class Center(Base):
         encrypt_key = KeyManager.encrypt_with_pub(key, pub_key)
         self.client2key[tuple(client_addr)] = key
         logging.info(f"super {self.addr} generate key {key}")
-        self.rpc.send(
+        self.sendto(
             {
                 "type": Msg.INIT_SEESION_RESPONSE,
                 "encrypt-key": encrypt_key.hex(),  # to string, 以使其能被json化
@@ -64,7 +54,7 @@ class Center(Base):
         client_id = tuple(msg["client_id"])
         key = self.client2key.get(client_id, None)
         if key is not None:
-            self.rpc.send(
+            self.sendto(
                 {
                     "type": Msg.SUPER_SEARCH_KEY_RESPONSE,
                     "key": key.hex(),

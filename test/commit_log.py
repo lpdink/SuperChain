@@ -10,7 +10,7 @@ Description: TDD：提交日志(上链)的测试程序:
 from common import get_config, logging
 from common.KeyManager import KeyManager
 from cs import Client, Server
-from nodes import *
+from protocols import *
 from utils import sha256
 
 if __name__ == "__main__":

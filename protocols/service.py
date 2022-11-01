@@ -1,22 +1,20 @@
 """
 Author: lpdink
-Date: 2022-10-07 01:59:10
+Date: 2022-10-28 08:21:59
 LastEditors: lpdink
-LastEditTime: 2022-10-24 06:23:48
-Description: 业务链节点
+LastEditTime: 2022-10-28 09:30:03
+Description: 
 """
-import json
-
-from common import config, logging
-from framework import factory
-from nodes.base import Base
+from common import KeyManager, config, logging
 from utils import Msg, sha256, value_dispatch
 
+from .base import BaseProtocol
+from .node import nodefactory
 
-@factory("nodes.Service")
-class Service(Base):
-    def __init__(self, addr=None, config=config) -> None:
-        super().__init__(addr, config)
+
+@nodefactory("protocols.Service")
+class ServiceProtocol(BaseProtocol):
+    def __init__(self) -> None:
         self.client2cross = dict()
         self.cross2client = dict()
         self.log_repo = dict()  # 日志的存储位置
@@ -39,7 +37,7 @@ class Service(Base):
             cross = self.cross
             self.client2cross[addr] = cross
             self.cross2client[cross] = addr
-        self.rpc.send(msg, cross)
+        self.sendto(msg, cross)
         logging.info(
             f"service node {self.addr} handle msg {type} forward package to cross {cross}"
         )
@@ -49,7 +47,7 @@ class Service(Base):
         client_addr = msg.get("client-addr", None)
         if client_addr is None:
             logging.error(f"{type} have not client-addr section. Handle msg failed.")
-        self.rpc.send(msg, tuple(client_addr))
+        self.sendto(msg, tuple(client_addr))
 
     @handle_msg.register(Msg.CLIENT_COMMIT_LOG_REQUEST)
     def _(self, type, msg, addr):
@@ -70,7 +68,7 @@ class Service(Base):
         self.commit2flag[commit_id] = 1
         for s_addr in self._service_addrs:
             if s_addr != self.addr:
-                self.rpc.send(
+                self.sendto(
                     {
                         "type": Msg.SERVICE_COMMIT_LOG_REQUEST,
                         "client_id": msg["client_id"],
@@ -93,7 +91,7 @@ class Service(Base):
             self.log_repo[client_id] = {log_id: log}
         else:
             self.log_repo[client_id][log_id] = log
-        self.rpc.send(
+        self.sendto(
             {"type": Msg.SERVICE_COMMIT_LOG_RESPONSE, "commit_id": commit_id}, addr
         )
 
@@ -115,7 +113,7 @@ class Service(Base):
             log = self.log_repo[c_addr][log_id]
             addr, port = c_addr.split(",")
             c_addr = (addr, int(port))
-            self.rpc.send(
+            self.sendto(
                 {
                     "type": Msg.CLIENT_COMMIT_LOG_RESPONSE,
                     "client_id": c_addr,
@@ -127,7 +125,7 @@ class Service(Base):
             logging.info(f"client {c_addr} log {log_id} commited")
             # 将包发送给super以供给监察
             cross = self.cross
-            self.rpc.send(
+            self.sendto(
                 {
                     "type": Msg.SERVICE_FORWARD_TO_SUPER,
                     "client_id": c_addr,
@@ -153,7 +151,7 @@ class Service(Base):
         # 遍历其他service节点，要求他们删除该风险日志
         for s_addr in self._service_addrs:
             if s_addr != self.addr:
-                self.rpc.send(
+                self.sendto(
                     {
                         "type": Msg.SERVICE_DELETE_TO_SERVICE,
                         "client_id": msg["client_id"],

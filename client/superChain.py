@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
-from cs.client import Client
 from datetime import datetime
+from tkinter import filedialog, ttk
+
+from cs.client import Client
 
 VISIABLE_X_INIT = 960
 VISIABLE_Y_INIT = 720
@@ -35,7 +36,7 @@ class Window:
         )
         input_frame.grid(row=0, stick=tk.NW)
         # input_frame.grid_propagate(0)
-        main_server_label = tk.Label(input_frame, text="主服务器端口")
+        main_server_label = tk.Label(input_frame, text="服务器端口")
         main_server_label.grid(row=0, column=0, sticky=tk.W)
         main_server_input = tk.Entry(input_frame, show=None, width=INPUTBOX_LENGTH)
         main_server_input.grid(row=0, column=1, sticky=tk.NW)
