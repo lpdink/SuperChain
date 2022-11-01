@@ -2,7 +2,7 @@
 Author: lpdink
 Date: 2022-10-28 08:21:46
 LastEditors: lpdink
-LastEditTime: 2022-10-28 10:43:27
+LastEditTime: 2022-11-01 07:35:28
 Description: 
 """
 import asyncio
@@ -26,9 +26,15 @@ class BaseProtocol(asyncio.DatagramProtocol):
             )
             with open(addr_file_path, "r") as file:
                 self._netwrok = json.load(file)
-            self._service_addrs = self._netwrok["ServiceProtocol"]
-            self._super_addrs = self._netwrok["SuperProtocol"]
-            self._cross_addrs = self._netwrok["CrossProtocol"]
+            self._service_addrs = list(
+                map(lambda x: tuple(x), self._netwrok["ServiceProtocol"])
+            )
+            self._super_addrs = list(
+                map(lambda x: tuple(x), self._netwrok["SuperProtocol"])
+            )
+            self._cross_addrs = list(
+                map(lambda x: tuple(x), self._netwrok["CrossProtocol"])
+            )
 
     def datagram_received(self, data, addr):
         data = json.loads(data.decode())
