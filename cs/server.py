@@ -2,14 +2,18 @@
 Author: lpdink
 Date: 2022-10-07 02:34:16
 LastEditors: lpdink
-LastEditTime: 2022-10-10 08:36:18
+LastEditTime: 2022-10-28 10:41:27
 Description: 后端业务主服务器，用于批量创建及管理节点，监测节点性能。
 """
+import json
+import os
 import random
+import socket
+import time
 from multiprocessing import Process
 
 from common import logging
-from framework import factory
+from protocols import nodefactory
 
 
 class Server:
@@ -21,34 +25,39 @@ class Server:
         return cls._instance
 
     def __init__(self, config) -> None:
-        factory.create_obj_from_config(config)
-        self._service_group = factory["service_group"]
-        self._super_group = factory["super_group"]
-        self._cross_group = factory["cross_group"]
-        self._center = factory["center"]
+        nodefactory.create_node_from_config(config)
+        # print(nodefactory.name2objs.keys())
+        self._service_group = nodefactory["service_group"]
+        self._super_group = nodefactory["super_group"]
+        self._cross_group = nodefactory["cross_group"]
+        self._center = nodefactory["center"]
         if not isinstance(self._center, list):
             self._center = [self._center]
         self._all_node_group = (
             self._service_group + self._super_group + self._cross_group + self._center
         )
         self._process_pool = []
-        # 将网络情况告知所有节点
-        self.set_network_graph()
+        self._set_port()
 
-    def set_network_graph(self):
-        service_addrs = [node.addr for node in self._service_group]
-        super_addrs = [node.addr for node in self._super_group]
-        cross_addrs = [node.addr for node in self._cross_group]
-        center_addrs = [node.addr for node in self._center]
-        assert len(center_addrs) == 1
-        network = {
-            "service_addrs": service_addrs,
-            "super_addrs": super_addrs,
-            "cross_addrs": cross_addrs,
-            "center_addrs": center_addrs,
-        }
+    def _set_port(self):
+        # 为节点分配端口
         for node in self._all_node_group:
-            node.set_network_graph(network)
+            # 得到一个可用端口
+            sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sk.bind(("127.0.0.1", 0))
+            node.addr = sk.getsockname()
+            node.port = sk.getsockname()[1]
+            sk.close()
+        # 将端口分布写出到外存，以便协议能获取
+        rst = dict()
+        for node in self._all_node_group:
+            if node.protocol.__name__ not in rst.keys():
+                rst[node.protocol.__name__] = [node.addr]
+            else:
+                rst[node.protocol.__name__].append(node.addr)
+        file_path = os.path.join(os.path.dirname(__file__), "../resources/.addr.json")
+        with open(file_path, "w") as file:
+            json.dump(rst, file, indent=4)
 
     @property
     def service(self):

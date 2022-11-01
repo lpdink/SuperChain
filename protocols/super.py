@@ -1,20 +1,20 @@
 """
 Author: lpdink
-Date: 2022-10-07 01:59:10
+Date: 2022-10-28 08:22:02
 LastEditors: lpdink
-LastEditTime: 2022-10-24 06:12:08
-Description: 监管链节点
+LastEditTime: 2022-10-28 09:30:08
+Description: 
 """
 from common import KeyManager, config, logging
-from framework import factory
-from nodes.base import Base
 from utils import Msg, sha256, value_dispatch
 
+from .base import BaseProtocol
+from .node import nodefactory
 
-@factory("nodes.Super")
-class Super(Base):
-    def __init__(self, addr=None, config=config) -> None:
-        super().__init__(addr, config)
+
+@nodefactory("protocols.Super")
+class SuperProtocol(BaseProtocol):
+    def __init__(self) -> None:
         self.to_supervise_pool = dict()
 
     @value_dispatch
@@ -32,7 +32,7 @@ class Super(Base):
         else:
             self.to_supervise_pool[client_id].append(encrypt_log)
         # 向密钥中心查询该client_id的key
-        self.rpc.send(
+        self.sendto(
             {"type": Msg.SUPER_SEARCH_KEY_REQUEST, "client_id": client_id}, self.center
         )
 
@@ -50,7 +50,7 @@ class Super(Base):
             logging.info(f"[Super] supervise log:{log}, is risky? {is_risky}")
             if is_risky:
                 logging.warning(f"log {log} is risky! Prepare to delete it.")
-                self.rpc.send(
+                self.sendto(
                     {
                         "type": Msg.SUPER_DELETE_TO_SERVICE,
                         "client_id": client_id,

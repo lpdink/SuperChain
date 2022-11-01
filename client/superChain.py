@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
-from cs.client import Client
 from datetime import datetime
+from tkinter import filedialog, ttk
+
+from cs.client import Client
 
 VISIABLE_X_INIT = 960
 VISIABLE_Y_INIT = 720

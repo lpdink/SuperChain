@@ -1,29 +1,28 @@
 {
-    "objects_group": [
+    "nodes_group": [
         {
             "name": "service_group",
-            "clazz": "nodes.Service",
+            "protocol": "protocols.Service",
             "args": {},
             "nums": 3
         },
         {
             "name": "cross_group",
-            "clazz": "nodes.Cross",
+            "protocol": "protocols.Cross",
             "args": {},
             "nums": 3
         },
         {
             "name": "super_group",
-            "clazz": "nodes.Super",
+            "protocol": "protocols.Super",
             "args": {},
             "nums": 3
-        }
-    ],
-    "objects": [
+        },
         {
             "name": "center",
-            "clazz": "nodes.Center",
-            "args": {}
+            "protocol": "protocols.Center",
+            "args": {},
+            "nums": 1
         }
     ]
 }
