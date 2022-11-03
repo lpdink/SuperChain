@@ -4,19 +4,19 @@
             "name": "service_group",
             "protocol": "protocols.Service",
             "args": {},
-            "nums": 3
+            "nums": 192
         },
         {
             "name": "cross_group",
             "protocol": "protocols.Cross",
             "args": {},
-            "nums": 3
+            "nums": 192
         },
         {
             "name": "super_group",
             "protocol": "protocols.Super",
             "args": {},
-            "nums": 3
+            "nums": 192
         },
         {
             "name": "center",
