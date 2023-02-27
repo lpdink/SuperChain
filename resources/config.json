@@ -6,5 +6,9 @@
     },
     "key":{
         "pair_key_length":512
+    },
+    "consensus":{
+        "view_conversion_time":60,
+        "batch_size":512
     }
 }

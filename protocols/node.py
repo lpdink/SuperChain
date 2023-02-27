@@ -8,8 +8,10 @@ Description:
 import asyncio
 import random
 import sys
+import json
 
-from common import logging
+from common import logging, config
+from utils import ConsensusMsg
 
 
 class Node:
@@ -21,13 +23,18 @@ class Node:
 
     async def run_node(self):
         loop = asyncio.get_running_loop()
-        transport, _ = await loop.create_datagram_endpoint(
+        transport, protocol_obj = await loop.create_datagram_endpoint(
             lambda: self.protocol(), local_addr=self.addr
         )
-        try:
-            await asyncio.sleep(60 * 60 * 24)  # Serve for 1 day.
-        finally:
-            transport.close()
+        msg = {"type":ConsensusMsg.follower.RESET}
+        msg = json.dumps(msg).encode("utf-8")
+        while True:
+            try:
+                protocol_obj.reset = True
+                await asyncio.sleep(config.consensus.view_conversion_time)  # 视图转换时间
+                transport.sendto(msg, tuple(self.addr))
+            except:
+                transport.close()
 
 
 class NodeFactory:

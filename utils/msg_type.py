@@ -20,6 +20,21 @@ class Msg:
     SUPER_SEARCH_KEY_RESPONSE = 1010  # 监管查询指定client-id密钥响应，center->super
     SERVICE_DELETE_TO_SERVICE = 1011  # 业务链内部删除日志请求，service->service.
 
+class LeaderMsg:
+    BEGIN_ANNOUNCEMENT=2000 # leader->leader 达到batch_size，开始共识。
+    ANNOUNCEMENT = 2001 # leader-> follower
+    CHALLANGE = 2002 # leader->follower
+
+class FollowerMsg:
+    COMMITMENT = 3000
+    RESET = 3001
+
+class ConsensusMsg:
+    leader = LeaderMsg
+    follower = FollowerMsg
+    VIEW_CONVERSION = 5000
+    USER_REQUEST = 5001
+
 
 if __name__ == "__main__":
     import json

@@ -2,3 +2,4 @@ __pycache__/
 resources/log/
 .*
 frontend/node_modules/*
+third_party/*
