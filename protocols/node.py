@@ -6,11 +6,11 @@ LastEditTime: 2022-10-28 10:41:46
 Description: 
 """
 import asyncio
+import json
 import random
 import sys
-import json
 
-from common import logging, config
+from common import config, logging
 from utils import ConsensusMsg
 
 
@@ -20,7 +20,7 @@ class Node:
 
     def run(self):
         asyncio.run(self.run_node())
-    
+
     async def run_node(self):
         loop = asyncio.get_running_loop()
         if not hasattr(self, "role"):
@@ -29,12 +29,20 @@ class Node:
             )
         else:
             # 共识算法情况
-            assert hasattr(self, "right") and hasattr(self, "left") and hasattr(self, "parent") and hasattr(self, "leader")
+            assert (
+                hasattr(self, "right")
+                and hasattr(self, "left")
+                and hasattr(self, "parent")
+                and hasattr(self, "leader")
+            )
             transport, protocol_obj = await loop.create_datagram_endpoint(
-                lambda: self.protocol(self.role, self.left, self.right, self.parent, self.leader), local_addr=self.addr
+                lambda: self.protocol(
+                    self.role, self.left, self.right, self.parent, self.leader
+                ),
+                local_addr=self.addr,
             )
         try:
-            await asyncio.sleep(24*60*60)
+            await asyncio.sleep(24 * 60 * 60)
         except:
             transport.close()
 

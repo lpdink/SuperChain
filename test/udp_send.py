@@ -1,10 +1,9 @@
-import socket
 import json
+import socket
 import time
 
-
-if __name__=="__main__":
-    data = {"data":1}
+if __name__ == "__main__":
+    data = {"data": 1}
     data = json.dumps(data).encode("utf-8")
     addr = ("127.0.0.1", 9999)
     sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

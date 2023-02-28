@@ -54,21 +54,13 @@ class ConsensusServer:
         self.consensus_group[0].parent = None
         self.consensus_group[0].left = None
         self.consensus_group[0].right = None
-        tree_nodes = self.consensus_group[1:] # 浅拷贝正是我们需要的
+        tree_nodes = self.consensus_group[1:]  # 浅拷贝正是我们需要的
         for idx, node in enumerate(tree_nodes):
             left_idx = 2 * idx + 1
             right_idx = 2 * idx + 2
             parent_idx = int((idx - 1) / 2)
-            node.left = (
-                tree_nodes[left_idx]
-                if left_idx < len(tree_nodes)
-                else None
-            )
-            node.right = (
-                tree_nodes[right_idx]
-                if right_idx < len(tree_nodes)
-                else None
-            )
+            node.left = tree_nodes[left_idx] if left_idx < len(tree_nodes) else None
+            node.right = tree_nodes[right_idx] if right_idx < len(tree_nodes) else None
             node.parent = tree_nodes[parent_idx]
             node.leader = tree_nodes[0]
             if idx == 0:

@@ -21,14 +21,14 @@ class EchoServerProtocol:
         # print("Received %r from %s" % (message, addr))
         # print("Send %r to %s" % (message, addr))
         # self.transport.sendto(data, addr)
-        if self.count==0:
+        if self.count == 0:
             self.start = time.perf_counter()
-        if self.count>=500000:
+        if self.count >= 500000:
             self.end = time.perf_counter()
             print(f"use time:{self.end-self.start} s")
-            self.count=0
-            self.start=time.perf_counter()
-        self.count+=1
+            self.count = 0
+            self.start = time.perf_counter()
+        self.count += 1
 
 
 async def main():

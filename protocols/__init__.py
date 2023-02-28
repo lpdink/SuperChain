@@ -7,8 +7,8 @@ Description:
 """
 from .base import BaseProtocol
 from .center import CenterProtocol
+from .consensus import ConsensusMsg
 from .cross import CrossProtocol
 from .node import nodefactory
 from .service import ServiceProtocol
 from .super import SuperProtocol
-from .consensus import ConsensusMsg

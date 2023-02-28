@@ -1,14 +1,13 @@
-import argparse, json, os
+import argparse
+import json
+import os
 
-from .schnorr_lib import n, has_even_y, pubkey_point_gen_from_int, bytes_from_point 
+from .schnorr_lib import bytes_from_point, has_even_y, n, pubkey_point_gen_from_int
 
 
 def create_keypair(n_keys: int):
     # Create json
-    users = {
-        "$schema": "./users_schema.json",
-        "users": []
-    }
+    users = {"$schema": "./users_schema.json", "users": []}
 
     # Generate n keys
     for i in range(0, n_keys):
@@ -20,20 +19,27 @@ def create_keypair(n_keys: int):
         # Check if the point P has the y-coordinate even; negate the private key otherwise
         privkey_even = privkey_int if has_even_y(publickey) else n - privkey_int
 
-        hex_privkey = hex(privkey_even).replace('0x', '').rjust(64, '0')
-        users["users"].append({
-            "privateKey": hex_privkey,
-            "publicKey": bytes_from_point(publickey).hex()
-        })
+        hex_privkey = hex(privkey_even).replace("0x", "").rjust(64, "0")
+        users["users"].append(
+            {"privateKey": hex_privkey, "publicKey": bytes_from_point(publickey).hex()}
+        )
     return users
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Creates one or more key pairs which are stored in a JSON file and can be used to sign and verify a message')
-    parser.add_argument('-n', '--nkeys', type=int, required=False, help='Number of pairs of keys to generate, if not specified a single keypair will be generated')
+    parser = argparse.ArgumentParser(
+        description="Creates one or more key pairs which are stored in a JSON file and can be used to sign and verify a message"
+    )
+    parser.add_argument(
+        "-n",
+        "--nkeys",
+        type=int,
+        required=False,
+        help="Number of pairs of keys to generate, if not specified a single keypair will be generated",
+    )
     n_keys = parser.parse_args().nkeys
 
-    if not n_keys: 
+    if not n_keys:
         n_keys = 1
 
     users = create_keypair(n_keys)

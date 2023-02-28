@@ -3,6 +3,7 @@ import json
 
 # 要有主动设置超时器的能力.
 
+
 class TestProtocol:
     def connection_made(self, transport):
         self.transport = transport
@@ -48,6 +49,8 @@ class Node:
         #     await asyncio.sleep(60 * 60 * 24)  # Serve for 1 day.
         # finally:
         #     transport.close()
-if __name__=="__main__":
+
+
+if __name__ == "__main__":
     node = Node(TestProtocol)
     node.run()

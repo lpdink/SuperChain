@@ -1,16 +1,17 @@
 import json
+
 from common import KeyManager, config, logging
 from utils import (
-    Msg,
     ConsensusMsg,
-    sha256,
-    value_dispatch,
+    G,
+    Msg,
+    RoleType,
     check_role,
-    point_mul,
     create_keypair,
     int_from_hex,
-    G,
-    RoleType,
+    point_mul,
+    sha256,
+    value_dispatch,
 )
 
 from .base import BaseProtocol
@@ -49,7 +50,11 @@ class ConsensusProtocol(BaseProtocol):
             exit()
         self.request_pool.append(data)
         if len(self.request_pool) >= self.batch_size:
-            rst_msg = {"type": ConsensusMsg.leader.BEGIN_ANNOUNCEMENT, "client": addr, "data":self.request_pool[: self.batch_size]}
+            rst_msg = {
+                "type": ConsensusMsg.leader.BEGIN_ANNOUNCEMENT,
+                "client": addr,
+                "data": self.request_pool[: self.batch_size],
+            }
             self.sendto(rst_msg, self.leader.addr)
             self.request_pool = self.request_pool[self.batch_size :]
 

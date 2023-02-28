@@ -26,15 +26,21 @@ class BaseProtocol(asyncio.DatagramProtocol):
             )
             with open(addr_file_path, "r") as file:
                 self._netwrok = json.load(file)
-            self._service_addrs = list(
-                map(lambda x: tuple(x), self._netwrok["ServiceProtocol"])
-            ) if "ServiceProtocol" in self._netwrok.keys() else None
-            self._super_addrs = list(
-                map(lambda x: tuple(x), self._netwrok["SuperProtocol"])
-            ) if "SuperProtocol" in self._netwrok.keys() else None
-            self._cross_addrs = list(
-                map(lambda x: tuple(x), self._netwrok["CrossProtocol"])
-            ) if "CrossProtocol" in self._netwrok.keys() else None
+            self._service_addrs = (
+                list(map(lambda x: tuple(x), self._netwrok["ServiceProtocol"]))
+                if "ServiceProtocol" in self._netwrok.keys()
+                else None
+            )
+            self._super_addrs = (
+                list(map(lambda x: tuple(x), self._netwrok["SuperProtocol"]))
+                if "SuperProtocol" in self._netwrok.keys()
+                else None
+            )
+            self._cross_addrs = (
+                list(map(lambda x: tuple(x), self._netwrok["CrossProtocol"]))
+                if "CrossProtocol" in self._netwrok.keys()
+                else None
+            )
 
     def datagram_received(self, data, addr):
         data = json.loads(data.decode())

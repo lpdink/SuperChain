@@ -46,6 +46,7 @@ class Window:
             input_frame, width=COMMIT_LOG_WIDTH, height=COMMIT_LOG_HEIGHT
         )
         to_commit_log_area.grid(row=2, column=1, sticky=tk.W)
+
         # to_commit_log_area.insert('end', 'new material to insert', ('highlightline', 'recent', 'warning'))
         # to_commit_log_area.insert("2.0","this is a begin test piece.\n")
         # end = to_commit_log_area.index("end")
