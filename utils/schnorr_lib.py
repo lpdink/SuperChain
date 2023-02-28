@@ -115,7 +115,7 @@ def lift_x_even_y(b: bytes) -> Optional[Point]:
 
 
 # Get hash digest with SHA256
-def sha256(b: bytes) -> bytes:
+def sha256_bytes(b: bytes) -> bytes:
     return hashlib.sha256(b).digest()
 
 
@@ -248,7 +248,7 @@ def schnorr_musig_sign(msg: bytes, users: list) -> bytes:
     L = b''
     for u in users:
         L += pubkey_gen_from_hex(u["privateKey"])
-    L = sha256(L)
+    L = sha256_bytes(L)
 
     Rsum = None
     X = None
@@ -262,7 +262,7 @@ def schnorr_musig_sign(msg: bytes, users: list) -> bytes:
         
         # KeyAggCoef
         # ai = h(L||Pi)
-        ai = int_from_bytes(sha256(L + bytes_from_point(Pi)))
+        ai = int_from_bytes(sha256_bytes(L + bytes_from_point(Pi)))
         u["ai"] = ai
 
         # Computation of X~
@@ -324,7 +324,7 @@ def schnorr_musig2_sign(msg: bytes, users: list) -> bytes:
     L = b''
     for u in users:
         L += pubkey_gen_from_hex(u["privateKey"])
-    L = sha256(L)
+    L = sha256_bytes(L)
 
     X = None
     for u in users:
@@ -337,7 +337,7 @@ def schnorr_musig2_sign(msg: bytes, users: list) -> bytes:
 
         # KeyAggCoef
         # ai = h(L||Pi)
-        ai = int_from_bytes(sha256(L + bytes_from_point(Pi)))
+        ai = int_from_bytes(sha256_bytes(L + bytes_from_point(Pi)))
         u["ai"] = ai
 
         # Computation of X~
@@ -381,7 +381,7 @@ def schnorr_musig2_sign(msg: bytes, users: list) -> bytes:
         Rbytes += bytes_from_point(Rj)
 
     # b = h(R1 || ... || Rn || X || M)
-    b = sha256(Rbytes + bytes_from_point(X) + msg)
+    b = sha256_bytes(Rbytes + bytes_from_point(X) + msg)
 
     Rsum = None
     for j, Rj in enumerate(Rj_list):

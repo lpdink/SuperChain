@@ -48,6 +48,8 @@ class Logger(logging.Logger):
         file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
         file_format = logging.Formatter(fmt)
         file_handler.setFormatter(file_format)
+        stream_handler.setLevel(logging.WARNING) # 打印到命令行的日志级别
+        file_handler.setLevel(logging.WARNING)
         self.addHandler(stream_handler)
         self.addHandler(file_handler)
 

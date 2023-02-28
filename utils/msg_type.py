@@ -26,8 +26,10 @@ class LeaderMsg:
     CHALLANGE = 2002 # leader->follower
 
 class FollowerMsg:
+    # RESET = 
     COMMITMENT = 3000
-    RESET = 3001
+    RESPONSE = 3001
+
 
 class ConsensusMsg:
     leader = LeaderMsg

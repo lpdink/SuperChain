@@ -1,6 +1,6 @@
 import argparse, json, os
 
-from schnorr_lib import n, has_even_y, pubkey_point_gen_from_int, bytes_from_point 
+from .schnorr_lib import n, has_even_y, pubkey_point_gen_from_int, bytes_from_point 
 
 
 def create_keypair(n_keys: int):

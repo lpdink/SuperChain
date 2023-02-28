@@ -11,3 +11,4 @@ from .cross import CrossProtocol
 from .node import nodefactory
 from .service import ServiceProtocol
 from .super import SuperProtocol
+from .consensus import ConsensusMsg

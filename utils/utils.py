@@ -117,6 +117,13 @@ def sha256(text: str):
     text = text.encode("utf-8")
     return hashlib.sha256(text).hexdigest()
 
+class RoleType:
+    # 共识节点类型
+    POSTBOX = 100
+    LEADER = 101
+    FOLLOWER = 102
+    VERIFIER = 103
+    
 
 class UserMessage:
     # 共识算法的用户消息体

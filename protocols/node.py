@@ -20,21 +20,38 @@ class Node:
 
     def run(self):
         asyncio.run(self.run_node())
-
+    
     async def run_node(self):
         loop = asyncio.get_running_loop()
-        transport, protocol_obj = await loop.create_datagram_endpoint(
-            lambda: self.protocol(), local_addr=self.addr
-        )
-        msg = {"type":ConsensusMsg.follower.RESET}
-        msg = json.dumps(msg).encode("utf-8")
-        while True:
-            try:
-                protocol_obj.reset = True
-                await asyncio.sleep(config.consensus.view_conversion_time)  # 视图转换时间
-                transport.sendto(msg, tuple(self.addr))
-            except:
-                transport.close()
+        if not hasattr(self, "role"):
+            transport, protocol_obj = await loop.create_datagram_endpoint(
+                lambda: self.protocol(), local_addr=self.addr
+            )
+        else:
+            # 共识算法情况
+            assert hasattr(self, "right") and hasattr(self, "left") and hasattr(self, "parent") and hasattr(self, "leader")
+            transport, protocol_obj = await loop.create_datagram_endpoint(
+                lambda: self.protocol(self.role, self.left, self.right, self.parent, self.leader), local_addr=self.addr
+            )
+        try:
+            await asyncio.sleep(24*60*60)
+        except:
+            transport.close()
+
+    # async def run_node(self):
+    #     loop = asyncio.get_running_loop()
+    #     transport, protocol_obj = await loop.create_datagram_endpoint(
+    #         lambda: self.protocol(), local_addr=self.addr
+    #     )
+    #     msg = {"type":ConsensusMsg.follower.RESET}
+    #     msg = json.dumps(msg).encode("utf-8")
+    #     while True:
+    #         try:
+    #             protocol_obj.reset = True
+    #             await asyncio.sleep(config.consensus.view_conversion_time)  # 视图转换时间
+    #             transport.sendto(msg, tuple(self.addr))
+    #         except:
+    #             transport.close()
 
 
 class NodeFactory:
