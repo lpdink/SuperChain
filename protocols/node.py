@@ -23,22 +23,14 @@ class Node:
 
     async def run_node(self):
         loop = asyncio.get_running_loop()
-        if not hasattr(self, "role"):
+        if not hasattr(self, "init_status"):
             transport, protocol_obj = await loop.create_datagram_endpoint(
                 lambda: self.protocol(), local_addr=self.addr
             )
         else:
             # 共识算法情况
-            assert (
-                hasattr(self, "right")
-                and hasattr(self, "left")
-                and hasattr(self, "parent")
-                and hasattr(self, "leader")
-            )
             transport, protocol_obj = await loop.create_datagram_endpoint(
-                lambda: self.protocol(
-                    self.role, self.left, self.right, self.parent, self.leader
-                ),
+                lambda: self.protocol(self.init_status),
                 local_addr=self.addr,
             )
         try:

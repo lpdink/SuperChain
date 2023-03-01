@@ -7,11 +7,11 @@ from common import logging
 def check_role(*role):
     def decorate(func):
         def inside(self, *args):
-            if self.role not in role:
+            if self.init_status.role not in role:
                 logging.warning(
-                    f"node {self.addr} role check failed, {self.role} not in {role}. command will not exec."
+                    f"node {self.addr} role check failed, {self.init_status.role} not in {role}. command will not exec."
                 )
-                # print(f"node {self.addr} role check failed, {self.role} not in {role}. command will not exec.")
+                # print(f"node {self.addr} role check failed, {self.init_status.role} not in {role}. command will not exec.")
                 return None
             else:
                 rst = func(self, *args)
@@ -25,13 +25,13 @@ def check_role(*role):
 # 以下是check_role的测试.
 # class Node:
 #     def __init__(self) -> None:
-#         self.role = 1001
+#         self.init_status.role = 1001
 #         self.addr = "192.168.0.1"
 
 #     @check_role(1002, 1003)
 #     def test(self, params):
 #         print(f"test function called with {params}")
-#         print(f"addr:{self.addr} role:{self.role}")
+#         print(f"addr:{self.addr} role:{self.init_status.role}")
 #         return params
 
 #     def test2(self):

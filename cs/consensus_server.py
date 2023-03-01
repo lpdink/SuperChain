@@ -6,8 +6,8 @@ import time
 from multiprocessing import Process
 
 from common import logging
-from protocols import nodefactory
-from utils import RoleType
+from protocols import nodefactory, ConsensusNodeInit
+from utils import RoleType, create_keypair, pubkey_gen_from_hex, sha256_bytes
 
 
 class ConsensusServer:
@@ -49,25 +49,40 @@ class ConsensusServer:
             json.dump(rst, file, indent=4)
 
     def _set_tree(self):
-        self.consensus_group[0].role = RoleType.POSTBOX
-        self.consensus_group[0].leader = self.consensus_group[1]
-        self.consensus_group[0].parent = None
-        self.consensus_group[0].left = None
-        self.consensus_group[0].right = None
+        post_box_init = ConsensusNodeInit(
+            role=RoleType.POSTBOX, leader=self.consensus_group[1]
+        )
+        self.consensus_group[0].init_status = post_box_init
         tree_nodes = self.consensus_group[1:]  # 浅拷贝正是我们需要的
+        keys = create_keypair(len(tree_nodes))["users"]
+        L = b""
+        for key in keys:
+            L += pubkey_gen_from_hex(key["privateKey"])
+        L = sha256_bytes(L)
         for idx, node in enumerate(tree_nodes):
             left_idx = 2 * idx + 1
             right_idx = 2 * idx + 2
             parent_idx = int((idx - 1) / 2)
-            node.left = tree_nodes[left_idx] if left_idx < len(tree_nodes) else None
-            node.right = tree_nodes[right_idx] if right_idx < len(tree_nodes) else None
-            node.parent = tree_nodes[parent_idx]
-            node.leader = tree_nodes[0]
+            node_left = tree_nodes[left_idx] if left_idx < len(tree_nodes) else None
+            node_right = tree_nodes[right_idx] if right_idx < len(tree_nodes) else None
+            node_parent = tree_nodes[parent_idx]
+            node_leader = tree_nodes[0]
             if idx == 0:
-                node.role = RoleType.LEADER
-                node.parent = None
+                node_role = RoleType.LEADER
+                node_parent = None
             else:
-                node.role = RoleType.FOLLOWER
+                node_role = RoleType.FOLLOWER
+            node_status = ConsensusNodeInit(
+                node_role,
+                keys[idx]["publicKey"],
+                keys[idx]["privateKey"],
+                L,
+                node_left,
+                node_right,
+                node_parent,
+                node_leader,
+            )
+            node.init_status = node_status
 
     def run(self, behind=False):
         for node in self.consensus_group:
@@ -84,6 +99,6 @@ class ConsensusServer:
 
     def show_postbox_addr(self):
         assert (
-            self.consensus_group[0].role == RoleType.POSTBOX
+            self.consensus_group[0].init_status.role == RoleType.POSTBOX
         ), "group idx 0 should be POSTBOX."
         logging.warning(f"POSTBOX addr is {self.consensus_group[0].addr}")

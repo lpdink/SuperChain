@@ -5,7 +5,7 @@ import time
 from common import logging
 from utils import ConsensusMsg, UserMessage
 
-DST_ADDR = ("127.0.0.1", 63432)
+DST_ADDR = ("127.0.0.1", 50415)
 BATCH_SIZE = 512
 TEST_TIME = 30
 
