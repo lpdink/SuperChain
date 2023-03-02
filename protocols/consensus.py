@@ -47,9 +47,56 @@ class ConsensusCommitStatus:
         return self.x, self.rsum
 
 
+class Package:
+    @classmethod
+    def regain_package(cls, p_256):
+        pool = [None for _ in range(config.consensus.package_size)]
+        new_obj = cls(pool)
+        new_obj._sha256 = p_256
+        return new_obj
+
+    def __init__(self, batch_list) -> None:
+        self.pool = batch_list  # sha256:batch
+        self.max_size = config.consensus.package_size
+        self._sha256 = None
+        assert len(batch_list) == self.max_size
+
+    def __getitem__(self, idx):
+        return self.pool[idx]
+
+    def __len__(self):
+        return len(self.pool)
+
+    def put_in_with_bx(self, batch, bx):
+        self.pool[bx] = batch
+        return self
+
+    def is_full(self):
+        assert self.max_size >= len(self.pool)
+        return len(self.pool) == self.max_size
+
+    def regain_done(self):
+        for item in self.pool:
+            if item is None:
+                return False
+        return self.is_full()
+
+    def get_sha256(self):
+        if self._sha256 is not None:
+            return self._sha256
+        if not self.is_full():
+            raise RuntimeError("Is illegal to compute sha256 when package is not full.")
+        all_text = ""
+        for batch in self.pool:
+            all_text += str(batch)
+        self._sha256 = sha256(all_text)
+        return self._sha256
+
+
 class ConsensusNodePool:
     def __init__(self) -> None:
-        self.batch_pool = dict()  # 以batch为单位存放, sha256:data
+        self.batch_pool = list()
+        self.package_pool = dict()  # 每个package是一个业务包
         self.commit_status_pool = dict()  # 本节点commit状态
         self.left_promise_pool = dict()  # commitment阶段，左节点承诺
         self.right_promise_pool = dict()  # commitment阶段，右节点承诺
@@ -63,6 +110,8 @@ class ConsensusProtocol(BaseProtocol):
     def __init__(self, init_status: ConsensusNodeInit) -> None:
         self.init_status = init_status
         self.batch_size = config.consensus.batch_size
+        self.package_size = config.consensus.package_size
+        self.package = None
         self.pool = ConsensusNodePool()
         if init_status.role == RoleType.POSTBOX:
             self.request_pool = []  # 需求池，攒够一个batch后放入batch_pool
@@ -90,20 +139,32 @@ class ConsensusProtocol(BaseProtocol):
             self.sendto(rst_msg, self.init_status.leader.addr)
             self.request_pool = self.request_pool[self.batch_size :]
 
+    def send_package(self, package: Package, p_256, addr):
+        # p_256 = package.get_sha256()
+        for bx, batch in enumerate(package):
+            rst_msg = {
+                "type": ConsensusMsg.leader.ANNOUNCEMENT,
+                "data": batch,
+                "bx": bx,
+                "sha256": p_256,
+            }
+            self.sendto(rst_msg, addr)
+
     @handle_msg.register(ConsensusMsg.leader.BEGIN_ANNOUNCEMENT)
     @check_role(RoleType.LEADER)
     def announcement(self, type, msg, addr):
         batch_data = msg["data"]
         self.client_addr = msg["client"]
-        batch_data_256 = sha256(json.dumps(batch_data))
-        rst_msg = {
-            "type": ConsensusMsg.leader.ANNOUNCEMENT,
-            "data": batch_data,
-            "sha256": batch_data_256,
-        }
-        self.pool.batch_pool[batch_data_256] = batch_data
-        self.sendto(rst_msg, self.init_status.left.addr)
-        self.sendto(rst_msg, self.init_status.right.addr)
+        self.pool.batch_pool.append(batch_data)
+        # if len(self.pool.package_pool)<self.package_size:
+        #     if self.pool.package_pool[-1].
+        if len(self.pool.batch_pool) > self.package_size:
+            package = Package(self.pool.batch_pool[: self.package_size])
+            self.pool.batch_pool = self.pool.batch_pool[self.package_size :]
+            p_256 = package.get_sha256()
+            self.pool.package_pool[p_256] = package
+            self.send_package(package, p_256, self.init_status.left.addr)
+            self.send_package(package, p_256, self.init_status.right.addr)
 
     def get_commit_status(self, msg, X=None, Rsum=None):
         di = int_from_hex(self.init_status.private_key)
@@ -141,34 +202,45 @@ class ConsensusProtocol(BaseProtocol):
     @check_role(RoleType.FOLLOWER)
     def commitment(self, type, msg, addr):
         data = msg["data"]
+        bx = msg["bx"]
         sha256 = msg["sha256"]
         sha256_bytes = bytes.fromhex(sha256)
         # 上链
-        self.pool.batch_pool[sha256] = data
-        # 非叶节点直接转发
-        if self.init_status.left is not None and self.init_status.right is not None:
-            self.sendto(msg, self.init_status.left.addr)
-            self.sendto(msg, self.init_status.right.addr)
-        else:
-            # 叶子节点对msg进行审查，决定是否参与共识.
-            if self.is_valid(data):
-                # 密码学部分
-                commit_status = self.get_commit_status(sha256_bytes, X=None, Rsum=None)
-                self.pool.commit_status_pool[sha256] = commit_status
-                promise_x, promise_rsum = commit_status.get_promise()
-                valid = 1
+        if sha256 not in self.pool.package_pool.keys():
+            package = Package.regain_package(sha256)
+            self.pool.package_pool[sha256] = package
+        package = self.pool.package_pool[sha256]
+        package.put_in_with_bx(data, bx)
+
+        if package.regain_done():
+            # 非叶节点直接转发
+            if self.init_status.left is not None and self.init_status.right is not None:
+                # self.sendto(msg, self.init_status.left.addr)
+                # self.sendto(msg, self.init_status.right.addr)
+                self.send_package(package, sha256, self.init_status.left.addr)
+                self.send_package(package, sha256, self.init_status.right.addr)
             else:
-                promise_x, promise_rsum = None, None
-                self.pool.commit_status_pool[sha256] = None
-                valid = 0
-            rst_msg = {
-                "type": ConsensusMsg.follower.COMMITMENT,
-                "promise_x": promise_x,
-                "promise_rsum": promise_rsum,
-                "valid": valid,
-                "sha256": sha256,
-            }
-            self.sendto(rst_msg, addr)
+                # 叶子节点对msg进行审查，决定是否参与共识.
+                if self.is_valid(package):
+                    # 密码学部分
+                    commit_status = self.get_commit_status(
+                        sha256_bytes, X=None, Rsum=None
+                    )
+                    self.pool.commit_status_pool[sha256] = commit_status
+                    promise_x, promise_rsum = commit_status.get_promise()
+                    valid = 1
+                else:
+                    promise_x, promise_rsum = None, None
+                    self.pool.commit_status_pool[sha256] = None
+                    valid = 0
+                rst_msg = {
+                    "type": ConsensusMsg.follower.COMMITMENT,
+                    "promise_x": promise_x,
+                    "promise_rsum": promise_rsum,
+                    "valid": valid,
+                    "sha256": sha256,
+                }
+                self.sendto(rst_msg, addr)
 
     def aggregate_commit_(self, sha256, sha256_bytes):
         left_promise_x, left_promise_rsum = self.pool.left_promise_pool[sha256]
@@ -208,7 +280,7 @@ class ConsensusProtocol(BaseProtocol):
             and sha256 in self.pool.right_promise_pool.keys()
         ):
             # parent 节点审查
-            if self.is_valid(self.pool.batch_pool[sha256]):
+            if self.is_valid(self.pool.package_pool[sha256]):
                 # leader节点也进行了签名
                 promise_x, promise_rsum = self.aggregate_commit_(sha256, sha256_bytes)
                 valid = 1

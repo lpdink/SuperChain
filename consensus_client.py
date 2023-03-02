@@ -3,11 +3,12 @@ import socket
 import time
 from multiprocessing import Process
 
-from common import logging
+from common import config, logging
 from utils import ConsensusMsg, UserMessage
 
-DST_ADDR = ("127.0.0.1", 37070)
-BATCH_SIZE = 512
+DST_ADDR = ("127.0.0.1", 45454)
+BATCH_SIZE = config.consensus.batch_size
+PACKAGE_SIZE = config.consensus.package_size
 TEST_TIME = 30
 
 sk_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -25,7 +26,7 @@ def send():
         }
         data = json.dumps(data).encode("utf-8")
         sk_send.sendto(data, tuple(DST_ADDR))
-        time.sleep(0.0001)
+        time.sleep(0.000001)
 
 
 def get():
@@ -52,7 +53,7 @@ def get():
                 logging.warning(
                     f"package_num :{package_num}, time used: {time_used} s."
                 )
-                logging.warning(f"tps:{package_num*BATCH_SIZE/time_used}")
+                logging.warning(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}")
                 exit()
 
 
