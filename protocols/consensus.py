@@ -253,6 +253,11 @@ class ConsensusProtocol(BaseProtocol):
                     "challenge": challenge,
                     "sha256": sha256,
                 }
+                # leader自己反转ai, ki
+                if flag_ai:
+                    self.pool.commit_status_pool[sha256].ai = n - self.pool.commit_status_pool[sha256].ai
+                if flag_ki:
+                    self.pool.commit_status_pool[sha256].ki = n - self.pool.commit_status_pool[sha256].ki
                 # leader自己保留challenge
                 self.pool.challenge_pool[sha256] = challenge
                 self.sendto(rst_msg, self.init_status.left.addr)
