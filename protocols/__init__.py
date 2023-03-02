@@ -7,7 +7,7 @@ Description:
 """
 from .base import BaseProtocol
 from .center import CenterProtocol
-from .consensus import ConsensusProtocol,ConsensusNodeInit
+from .consensus import ConsensusNodeInit, ConsensusProtocol
 from .cross import CrossProtocol
 from .node import nodefactory
 from .service import ServiceProtocol

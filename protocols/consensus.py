@@ -53,9 +53,9 @@ class ConsensusNodePool:
         self.commit_status_pool = dict()  # 本节点commit状态
         self.left_promise_pool = dict()  # commitment阶段，左节点承诺
         self.right_promise_pool = dict()  # commitment阶段，右节点承诺
-        self.left_response_pool = dict() # response阶段，左节点响应
-        self.right_response_pool = dict() # response阶段，右节点响应
-        self.challenge_pool = dict() # response阶段，保存challenge
+        self.left_response_pool = dict()  # response阶段，左节点响应
+        self.right_response_pool = dict()  # response阶段，右节点响应
+        self.challenge_pool = dict()  # response阶段，保存challenge
 
 
 @nodefactory("protocols.Consensus")
@@ -171,12 +171,8 @@ class ConsensusProtocol(BaseProtocol):
             self.sendto(rst_msg, addr)
 
     def aggregate_commit_(self, sha256, sha256_bytes):
-        left_promise_x, left_promise_rsum = self.pool.left_promise_pool[
-            sha256
-        ]
-        right_promise_x, right_promise_rsum = self.pool.right_promise_pool[
-            sha256
-        ]
+        left_promise_x, left_promise_rsum = self.pool.left_promise_pool[sha256]
+        right_promise_x, right_promise_rsum = self.pool.right_promise_pool[sha256]
         # 聚合承诺
         aggragate_x = point_add(left_promise_x, right_promise_x)
         aggragete_rsum = point_add(left_promise_rsum, right_promise_rsum)
@@ -255,9 +251,13 @@ class ConsensusProtocol(BaseProtocol):
                 }
                 # leader自己反转ai, ki
                 if flag_ai:
-                    self.pool.commit_status_pool[sha256].ai = n - self.pool.commit_status_pool[sha256].ai
+                    self.pool.commit_status_pool[sha256].ai = (
+                        n - self.pool.commit_status_pool[sha256].ai
+                    )
                 if flag_ki:
-                    self.pool.commit_status_pool[sha256].ki = n - self.pool.commit_status_pool[sha256].ki
+                    self.pool.commit_status_pool[sha256].ki = (
+                        n - self.pool.commit_status_pool[sha256].ki
+                    )
                 # leader自己保留challenge
                 self.pool.challenge_pool[sha256] = challenge
                 self.sendto(rst_msg, self.init_status.left.addr)
@@ -276,15 +276,22 @@ class ConsensusProtocol(BaseProtocol):
         # 这里保留challenge，是为了之后非叶节点能计算聚合.
         self.pool.challenge_pool[sha256] = challenge
         if flag_ai:
-            self.pool.commit_status_pool[sha256].ai = n - self.pool.commit_status_pool[sha256].ai
+            self.pool.commit_status_pool[sha256].ai = (
+                n - self.pool.commit_status_pool[sha256].ai
+            )
         if flag_ki:
-            self.pool.commit_status_pool[sha256].ki = n - self.pool.commit_status_pool[sha256].ki
+            self.pool.commit_status_pool[sha256].ki = (
+                n - self.pool.commit_status_pool[sha256].ki
+            )
         if self.init_status.left is not None and self.init_status.right is not None:
             self.sendto(msg, self.init_status.left.addr)
             self.sendto(msg, self.init_status.right.addr)
         else:
             di = int_from_hex(self.init_status.private_key)
-            ssum = (di * challenge * self.pool.commit_status_pool[sha256].ai + self.pool.commit_status_pool[sha256].ki) % n
+            ssum = (
+                di * challenge * self.pool.commit_status_pool[sha256].ai
+                + self.pool.commit_status_pool[sha256].ki
+            ) % n
             rst_msg = {
                 "type": ConsensusMsg.follower.RESPONSE,
                 "sha256": sha256,
@@ -299,7 +306,7 @@ class ConsensusProtocol(BaseProtocol):
         challenge = self.pool.challenge_pool[sha256]
         ai = self.pool.commit_status_pool[sha256].ai
         ki = self.pool.commit_status_pool[sha256].ki
-        ssum =left_ssum+right_ssum+(di*challenge*ai+ki)%n
+        ssum = left_ssum + right_ssum + (di * challenge * ai + ki) % n
         return ssum
 
     @handle_msg.register(ConsensusMsg.follower.RESPONSE)
@@ -307,14 +314,17 @@ class ConsensusProtocol(BaseProtocol):
     def aggregate_response(self, type, msg, addr):
         sha256 = msg["sha256"]
         ssum = msg["ssum"]
-        if tuple(addr)==self.init_status.left.addr:
+        if tuple(addr) == self.init_status.left.addr:
             self.pool.left_response_pool[sha256] = ssum
-        elif tuple(addr)==self.init_status.right.addr:
+        elif tuple(addr) == self.init_status.right.addr:
             self.pool.right_response_pool[sha256] = ssum
         else:
             logging.error("Parent node receive msg from wrong node!")
-        
-        if sha256 in self.pool.left_response_pool.keys() and sha256 in self.pool.right_response_pool.keys():
+
+        if (
+            sha256 in self.pool.left_response_pool.keys()
+            and sha256 in self.pool.right_response_pool.keys()
+        ):
             ssum = self.aggregate_response_(sha256)
             if self.init_status.role == RoleType.FOLLOWER:
                 rst_msg = {
@@ -324,11 +334,13 @@ class ConsensusProtocol(BaseProtocol):
                 }
                 self.sendto(rst_msg, self.init_status.parent.addr)
             elif self.init_status.role == RoleType.LEADER:
-                ssum = ssum%n
-                sig = bytes_from_point(self.pool.commit_status_pool[sha256].rsum)+bytes_from_int(ssum)
+                ssum = ssum % n
+                sig = bytes_from_point(
+                    self.pool.commit_status_pool[sha256].rsum
+                ) + bytes_from_int(ssum)
                 pub_key = bytes_from_point(self.pool.commit_status_pool[sha256].x)
                 if schnorr_verify(bytes.fromhex(sha256), pub_key, sig):
-                # 到这里流程走完了.
+                    # 到这里流程走完了.
                     logging.warning("all path done.")
                 else:
                     logging.warning("not pass!")

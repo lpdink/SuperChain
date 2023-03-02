@@ -6,7 +6,7 @@ import time
 from multiprocessing import Process
 
 from common import logging
-from protocols import nodefactory, ConsensusNodeInit
+from protocols import ConsensusNodeInit, nodefactory
 from utils import RoleType, create_keypair, pubkey_gen_from_hex, sha256_bytes
 
 
