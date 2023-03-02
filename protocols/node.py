@@ -30,8 +30,7 @@ class Node:
         else:
             # 共识算法情况
             transport, protocol_obj = await loop.create_datagram_endpoint(
-                lambda: self.protocol(self.init_status),
-                local_addr=self.addr,
+                lambda: self.protocol(self.init_status), local_addr=self.addr,
             )
         try:
             await asyncio.sleep(24 * 60 * 60)

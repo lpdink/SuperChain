@@ -84,7 +84,7 @@ class ConsensusProtocol(BaseProtocol):
         if len(self.request_pool) >= self.batch_size:
             rst_msg = {
                 "type": ConsensusMsg.leader.BEGIN_ANNOUNCEMENT,
-                "client": addr,
+                "client": msg["client"],
                 "data": self.request_pool[: self.batch_size],
             }
             self.sendto(rst_msg, self.init_status.leader.addr)
