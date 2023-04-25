@@ -1,15 +1,15 @@
 {
-    "connection":{
-        "use_tcp":0,
-        "timeout":5,
-        "recv_max_bytes":65535
+    "connection": {
+        "use_tcp": 0,
+        "timeout": 5,
+        "recv_max_bytes": 65535
     },
-    "key":{
-        "pair_key_length":512
+    "key": {
+        "pair_key_length": 512
     },
-    "consensus":{
-        "view_conversion_time":60,
-        "batch_size":512,
-        "package_size":8
+    "consensus": {
+        "view_conversion_time": 60,
+        "batch_size": 512,
+        "package_size": 8
     }
 }

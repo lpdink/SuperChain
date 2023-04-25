@@ -413,7 +413,7 @@ class ConsensusProtocol(BaseProtocol):
                 pub_key = bytes_from_point(self.pool.commit_status_pool[sha256].x)
                 if schnorr_verify(bytes.fromhex(sha256), pub_key, sig):
                     # 到这里流程走完了.
-                    logging.warning("all path done.")
+                    logging.info("all path done.")
                 else:
                     logging.warning("not pass!")
                 self.sendto(msg, self.client_addr)

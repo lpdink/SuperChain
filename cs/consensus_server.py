@@ -30,7 +30,12 @@ class ConsensusServer:
 
     def _set_port(self):
         # 为节点分配端口
-        for node in self.consensus_group:
+        for idx, node in enumerate(self.consensus_group):
+            if idx==0:
+                # postbox给固定端口23010
+                node.addr = ("127.0.0.1", 23010)
+                node.port = 23010
+                continue
             # 得到一个可用端口
             sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sk.bind(("127.0.0.1", 0))

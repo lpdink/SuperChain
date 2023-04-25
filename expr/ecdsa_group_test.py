@@ -40,3 +40,15 @@ signature_A = private_key_A.sign(confirm_A, ec.ECDSA(ec.hashes.SHA256()))
 
 # 其他节点收到确认消息和签名后，用A的公钥对签名进行验证
 public_key_A.verify(signature_A, confirm_A, ec.ECDSA(ec.hashes.SHA256()))
+
+# 假设有n个节点，1个leader，n-1个follower，考察对一个block完成共识需要的签名和验证次数：
+# Leader发起提案，sign:1, leader->follower
+# follower 接受提案，verify:n-1
+# follower 发表自己的意见，sign:n-1 follower->follower+leader
+# follower接受并确认彼此的意见:verify (n-1)*n 含leader
+# leader确认同意或不同意提议，sign:1 leader->follower
+# follower 接收并确认是否同意提议，verify: n-1
+# 共计sign: n+1, verify: (n-1)*(n+2)
+# 考虑ecdsa方案，在i5-12400(4.0GHz)上签名或验签一次需要0.05s，考虑64个节点，则总密码学耗时4223*0.05=211.15s
+# 考虑32个节点，总密码学耗时1087*0.05=54.35s
+# 但这是理想情况，实际上是跑不出来的，8包压一包对网络的要求很高，如果不能将一个block及时完成共识，udp包拥挤会导致丢包，从而始终无法完成共识。

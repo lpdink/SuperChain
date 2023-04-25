@@ -1,6 +1,7 @@
 import json
 import socket
 import time
+import os
 from multiprocessing import Process
 
 from common import config, logging
@@ -23,7 +24,8 @@ def to_red(text):
 
 while True:
     try:
-        port = int(input(to_yellow("请输入审查链POSTBOX端口，如果您不知道，请先执行python consensus_server.py：\n> ")).strip())
+        # port = int(input(to_yellow("请输入审查链POSTBOX端口，如果您不知道，请先执行python consensus_server.py：\n> ")).strip())
+        port = 23010
         DST_ADDR = ("127.0.0.1", port)
         break
     except ValueError:
@@ -39,7 +41,7 @@ def send():
         }
         data = json.dumps(data).encode("utf-8")
         sk_send.sendto(data, tuple(DST_ADDR))
-        time.sleep(0.000001)
+        time.sleep(0.0001)
 
 
 def get():
@@ -66,8 +68,10 @@ def get():
                 logging.warning(
                     f"package_num :{package_num}, time used: {time_used} s."
                 )
-                logging.warning(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}")
-                exit()
+                with open("./tps.log", "a+") as file:
+                    file.write(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}\n")
+                # print(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}")
+                os.system("killall -9 python")
 
 if __name__ == "__main__":
     send_process = Process(target=send)

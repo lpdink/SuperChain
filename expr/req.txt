@@ -1,0 +1,6 @@
+# python==3.10.9
+tqdm==4.64.1
+matplotlib==3.7.1
+ecdsa==0.18.0
+rsa==4.7.2
+py-ecc==6.0.0
