@@ -19,7 +19,7 @@ signature_A = private_key_A.sign(proposal, ec.ECDSA(ec.hashes.SHA256()))
 
 # A将提议和签名发送给B,C,D，B,C,D收到后用A的公钥对签名进行验证
 public_key_A.verify(signature_A, proposal, ec.ECDSA(ec.hashes.SHA256()))
-
+breakpoint()
 # B,C,D分别用自己的私钥对提议进行投票，并将投票结果和签名发送给其他节点
 vote_B = b"Agree"
 signature_B = private_key_B.sign(vote_B, ec.ECDSA(ec.hashes.SHA256()))

@@ -4,7 +4,7 @@
             "name": "consensus_group",
             "protocol": "protocols.Consensus",
             "args": {},
-            "nums": 32
+            "nums": 128
         }
     ]
 }

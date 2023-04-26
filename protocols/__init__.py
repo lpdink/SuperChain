@@ -12,3 +12,4 @@ from .cross import CrossProtocol
 from .node import nodefactory
 from .service import ServiceProtocol
 from .super import SuperProtocol
+from .network import NetworkProtocol, NetworkNodeInit
