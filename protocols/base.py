@@ -6,6 +6,7 @@ LastEditTime: 2022-11-01 07:35:28
 Description: 
 """
 import asyncio
+import socket
 import json
 import os
 import random
@@ -17,7 +18,7 @@ from .node import nodefactory
 
 
 @nodefactory("protocols.Base")
-class BaseProtocol(asyncio.DatagramProtocol):
+class BaseProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
         if not hasattr(self, "_network"):
@@ -42,18 +43,24 @@ class BaseProtocol(asyncio.DatagramProtocol):
                 else None
             )
 
-    def datagram_received(self, data, addr):
+    def data_received(self, data):
         data = json.loads(data.decode())
         msg_type = data["type"]
+        addr = data["true_addr"]
         self.handle_msg(msg_type, data, addr)
 
     def handle_msg(self, type, msg, addr):
         raise NotImplementedError("handle_msg should rewrite in sub-class")
 
     def sendto(self, msg, addr):
+        msg["true_addr"] = self.addr
         msg = json.dumps(msg).encode("utf-8")
-        self.transport.sendto(msg, tuple(addr))
-        logging.info(f"{self.addr} node send {msg} to {tuple(addr)}")
+        # self.transport.sendto(msg, tuple(addr))
+        # tcp
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(tuple(addr))
+            s.sendall(msg)
+        # logging.warning(f"{self.addr} node send {msg} to {tuple(addr)}")
 
     @property
     def addr(self):

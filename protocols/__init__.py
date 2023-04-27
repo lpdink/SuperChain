@@ -13,3 +13,4 @@ from .node import nodefactory
 from .service import ServiceProtocol
 from .super import SuperProtocol
 from .network import NetworkProtocol, NetworkNodeInit
+from .tree import TreeConsensusProtocol

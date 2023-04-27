@@ -2,9 +2,9 @@
     "nodes_group": [
         {
             "name": "consensus_group",
-            "protocol": "protocols.NetworkProtocol",
+            "protocol": "protocols.TreeConsensusProtocol",
             "args": {},
-            "nums": 256
+            "nums": 8
         }
     ]
 }

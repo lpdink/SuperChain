@@ -24,18 +24,15 @@ class Node:
     async def run_node(self):
         loop = asyncio.get_running_loop()
         if not hasattr(self, "init_status"):
-            transport, protocol_obj = await loop.create_datagram_endpoint(
-                lambda: self.protocol(), local_addr=self.addr
+            server = await loop.create_server(
+                lambda: self.protocol(), self.addr[0], self.addr[1],
             )
         else:
             # 共识算法情况
-            transport, protocol_obj = await loop.create_datagram_endpoint(
-                lambda: self.protocol(self.init_status), local_addr=self.addr,
-            )
-        try:
-            await asyncio.sleep(24 * 60 * 60)
-        except:
-            transport.close()
+            protocol = self.protocol(self.init_status)
+            server = await loop.create_server(lambda: protocol, self.addr[0], self.addr[1])
+        async with server:
+            await server.serve_forever()
 
     # async def run_node(self):
     #     loop = asyncio.get_running_loop()

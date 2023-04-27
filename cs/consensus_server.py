@@ -37,11 +37,13 @@ class ConsensusServer:
                 node.port = 23010
                 continue
             # 得到一个可用端口
-            sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sk.bind(("127.0.0.1", 0))
-            node.addr = sk.getsockname()
-            node.port = sk.getsockname()[1]
-            sk.close()
+            # sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # sk.bind(("127.0.0.1", 0))
+            # node.addr = sk.getsockname()
+            # node.port = sk.getsockname()[1]
+            # sk.close()
+            node.addr = ("127.0.0.1", 30000+idx)
+            node.port = 30000+idx
         # 将端口分布写出到外存，以便协议能获取
         rst = dict()
         for node in self.consensus_group:

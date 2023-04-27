@@ -11,11 +11,6 @@ BATCH_SIZE = config.consensus.batch_size
 PACKAGE_SIZE = config.consensus.package_size
 TEST_TIME = 10
 
-sk_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sk_send.bind(("127.0.0.1", 0))
-sk_get = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sk_get.bind(("127.0.0.1", 0))
-
 def to_yellow(text):
     return f"\033[33m{text}\033[0m"
 
@@ -31,17 +26,26 @@ while True:
     except ValueError:
         print(to_red("您输入的端口必须是一个整数"))
 
+sk_get = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sk_get.bind(("127.0.0.1", 0))
+# sk_get.connect(DST_ADDR)
 
 def send():
     while True:
+    # for _ in range(16384):
         data = {
             "type": ConsensusMsg.USER_REQUEST,
             "data": UserMessage.random_msg(),
             "client": sk_get.getsockname(),
+            "true_addr": sk_get.getsockname()
         }
         data = json.dumps(data).encode("utf-8")
-        sk_send.sendto(data, tuple(DST_ADDR))
-        time.sleep(0.0001)
+        s1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s1.connect(DST_ADDR)
+        s1.sendall(data)
+        s1.shutdown(socket.SHUT_RDWR)
+        s1.close()
+        time.sleep(0.000001)
 
 
 def get():
@@ -68,8 +72,9 @@ def get():
                 logging.warning(
                     f"package_num :{package_num}, time used: {time_used} s."
                 )
-                with open("./tps.log", "a+") as file:
-                    file.write(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}\n")
+                logging.warning(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}")
+                # with open("./tps.log", "a+") as file:
+                #     file.write(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}\n")
                 # print(f"tps:{package_num*BATCH_SIZE*PACKAGE_SIZE/time_used}")
                 os.system("killall -9 python")
 

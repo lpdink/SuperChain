@@ -9,3 +9,4 @@ from .client import Client
 from .consensus_server import ConsensusServer
 from .server import Server
 from .group_server import GroupServer
+from .tree_server import TreeServer
