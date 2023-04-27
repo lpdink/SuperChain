@@ -1,5 +1,6 @@
 import json
-
+import time
+import socket
 from common import KeyManager, config, logging
 from utils import *
 
@@ -23,6 +24,10 @@ class NetworkProtocol(BaseProtocol):
         self.agree_pool = dict()
         self.reponse_pool = dict()
         self.pool = ConsensusNodePool()
+        self.time_pool = dict()
+        self.max_tps = -1
+        self.total_tps = 0
+        self.finish_nums = 0
         if init_status.role == RoleType.POSTBOX:
             self.request_pool = []  # 需求池，攒够一个batch后放入batch_pool
 
@@ -66,10 +71,11 @@ class NetworkProtocol(BaseProtocol):
         batch_data = msg["data"]
         self.client_addr = msg["client"]
         self.pool.batch_pool.append(batch_data)
-        if len(self.pool.batch_pool) > self.package_size:
+        if len(self.pool.batch_pool) >= self.package_size:
             package = Package(self.pool.batch_pool[: self.package_size])
             self.pool.batch_pool = self.pool.batch_pool[self.package_size :]
             p_256 = package.get_sha256()
+            self.time_pool[p_256] = time.perf_counter()
             self.pool.package_pool[p_256] = package
             for node in self.init_status.nodes:
                 if node.addr!=self.addr:
@@ -115,7 +121,7 @@ class NetworkProtocol(BaseProtocol):
                 self.agree_pool[sha256] = 1
             else:
                 self.agree_pool[sha256]+=1
-            if self.agree_pool[sha256]>=len(self.init_status.nodes)//2:
+            if self.agree_pool[sha256]>=len(self.init_status.nodes)//3*2:
                 self.agree_pool[sha256]*=-10
                 msg = "confirm"
                 sign = self.init_status.private_key.sign(msg)
@@ -151,9 +157,21 @@ class NetworkProtocol(BaseProtocol):
             self.reponse_pool[sha256] = 1
         else:
             self.reponse_pool[sha256]+=1
-        if self.reponse_pool[sha256]>=len(self.init_status.nodes)//2:
+        if self.reponse_pool[sha256]>=len(self.init_status.nodes)//3*2:
             self.reponse_pool[sha256]*=-10
-            self.sendto(msg, self.client_addr)
+            # self.sendto(msg, self.client_addr)
+            sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sk.bind(("127.0.0.1", 0))
+            sk.sendto(b"all path done.", tuple(self.client_addr))
+            sk.close()
+            end = time.perf_counter()
+            duration = end - self.time_pool[sha256]
+            tps = self.package_size*self.batch_size/duration
+            self.max_tps = max(tps, self.max_tps)
+            self.total_tps+=tps
+            self.finish_nums+=1
+            self.avg_tps = self.total_tps/self.finish_nums
+            logging.warning(f"tps: {tps} max_tps:{self.max_tps} avg_tps:{self.avg_tps}")
             
     def is_valid(self, msgs):
         return True

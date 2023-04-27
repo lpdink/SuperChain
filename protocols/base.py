@@ -44,9 +44,12 @@ class BaseProtocol(asyncio.Protocol):
             )
 
     def data_received(self, data):
-        data = json.loads(data.decode())
+        try:
+            data = json.loads(data.decode())
+        except:
+            logging.error(data)
         msg_type = data["type"]
-        addr = data["true_addr"]
+        addr = tuple(data["true_addr"])
         self.handle_msg(msg_type, data, addr)
 
     def handle_msg(self, type, msg, addr):

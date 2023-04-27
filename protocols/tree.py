@@ -1,4 +1,5 @@
 import json
+import time
 import socket
 from common import KeyManager, config, logging
 from utils import *
@@ -15,7 +16,10 @@ class TreeConsensusProtocol(BaseProtocol):
         self.package_size = config.consensus.package_size
         self.package = None
         self.pool = ConsensusNodePool()
-        # self.tmp_idx = 0
+        self.time_pool = dict()
+        self.max_tps = -1
+        self.total_tps = 0
+        self.finish_nums=0
         if init_status.role == RoleType.POSTBOX:
             self.request_pool = []  # 需求池，攒够一个batch后放入batch_pool
 
@@ -67,6 +71,7 @@ class TreeConsensusProtocol(BaseProtocol):
             package = Package(self.pool.batch_pool[: self.package_size])
             self.pool.batch_pool = self.pool.batch_pool[self.package_size :]
             p_256 = package.get_sha256()
+            self.time_pool[p_256] = time.perf_counter()
             self.pool.package_pool[p_256] = package
             self.send_package(package, p_256, self.init_status.left.addr)
             self.send_package(package, p_256, self.init_status.right.addr)
@@ -207,7 +212,16 @@ class TreeConsensusProtocol(BaseProtocol):
                 sk.bind(("127.0.0.1", 0))
                 sk.sendto(b"all path done.", tuple(self.client_addr))
                 sk.close()
+                end = time.perf_counter()
+                duration = end - self.time_pool[sha256]
+                tps = self.package_size*self.batch_size/duration
+                self.max_tps = max(tps, self.max_tps)
+                self.total_tps+=tps
+                self.finish_nums+=1
+                self.avg_tps = self.total_tps/self.finish_nums
+                logging.warning(f"tps: {tps} max_tps:{self.max_tps} avg_tps:{self.avg_tps}")
                 # logging.warning("all path done.")
+                # logging.warning("finished:")
             else:
                 raise RuntimeError("This line should not be exec!")
             logging.info("aggregate_response")

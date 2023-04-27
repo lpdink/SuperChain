@@ -45,7 +45,7 @@ def send():
         s1.sendall(data)
         s1.shutdown(socket.SHUT_RDWR)
         s1.close()
-        time.sleep(0.000001)
+        time.sleep(0.0001)
 
 
 def get():
@@ -54,6 +54,7 @@ def get():
     last_time, this_time = None, None
     while True:
         data, addr = sk_get.recvfrom(65535)
+        print(data)
         package_num += 1
         # 单包时间
         if last_time is None:
@@ -82,4 +83,4 @@ if __name__ == "__main__":
     send_process = Process(target=send)
     get_process = Process(target=get)
     send_process.start()
-    get_process.start()
+    # get_process.start()
