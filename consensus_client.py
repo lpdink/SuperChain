@@ -47,7 +47,7 @@ def send():
         s1.sendall(data)
         s1.shutdown(socket.SHUT_RDWR)
         s1.close()
-        time.sleep(0.0001)
+        time.sleep(0.005)
 
 
 def get():

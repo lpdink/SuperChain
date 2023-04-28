@@ -4,7 +4,7 @@
             "name": "consensus_group",
             "protocol": "protocols.NetworkProtocol",
             "args": {},
-            "nums": 8
+            "nums": 64
         }
     ]
 }

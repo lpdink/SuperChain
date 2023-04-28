@@ -9,7 +9,7 @@
     },
     "consensus": {
         "view_conversion_time": 60,
-        "batch_size": 250,
-        "package_size": 8
+        "batch_size": 128,
+        "package_size": 16
     }
 }

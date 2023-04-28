@@ -90,21 +90,21 @@ def test_rsa():
 def draw():
     if config.run_schnoor:
         schnoor_rst = test_schnoor()
-        plt.plot(range(len(config.node_nums)), schnoor_rst, label="schnoor")
+        plt.plot(range(len(config.node_nums)), schnoor_rst, label="CoSi", marker=".")
     if config.run_ecdsa:
         ecdsa_rst = test_ecdsa()
-        plt.plot(range(len(config.node_nums)), ecdsa_rst, label="ecdsa")
+        plt.plot(range(len(config.node_nums)), ecdsa_rst, label="ECDSA", marker="*")
     if config.run_bls:
         bls_rst = test_bls()
-        plt.plot(range(len(config.node_nums)), bls_rst, label="bls")
+        plt.plot(range(len(config.node_nums)), bls_rst, label="BLS", marker="+")
     if config.run_rsa:
         rsa_rst = test_rsa()
-        plt.plot(range(len(config.node_nums)), rsa_rst, label="rsa")
+        plt.plot(range(len(config.node_nums)), rsa_rst, label="RSA", marker="o")
     plt.xticks(range(len(config.node_nums)), config.node_nums)
     plt.xlabel("node nums")
     plt.ylabel(f"run {config.run_times} times used(s)")
     plt.legend()
-    plt.savefig(f"{__file__}.png")
+    plt.savefig(f"{__file__}.svg", format="svg", dpi=1200)
 
 if __name__=="__main__":
     draw()
