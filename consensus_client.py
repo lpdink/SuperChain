@@ -7,6 +7,8 @@ from multiprocessing import Process
 from common import config, logging
 from utils import ConsensusMsg, UserMessage
 
+# msg = UserMessage.random_msg()
+# breakpoint()
 BATCH_SIZE = config.consensus.batch_size
 PACKAGE_SIZE = config.consensus.package_size
 TEST_TIME = 10
