@@ -10,6 +10,6 @@
     "consensus": {
         "view_conversion_time": 60,
         "batch_size": 256,
-        "package_size": 8
+        "package_size": 16
     }
 }
