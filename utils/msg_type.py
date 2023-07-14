@@ -31,6 +31,8 @@ class FollowerMsg:
     # RESET =
     COMMITMENT = 3000
     RESPONSE = 3001
+    PREPARE = 2003
+    REP_PREPARE = 3002
 
 
 class ConsensusMsg:

@@ -22,6 +22,7 @@ class NetworkProtocol(BaseProtocol):
         self.package_size = config.consensus.package_size
         self.package = None
         self.agree_pool = dict()
+        self.prepare_agree_pool = dict()
         self.reponse_pool = dict()
         self.pool = ConsensusNodePool()
         self.time_pool = dict()
@@ -67,7 +68,7 @@ class NetworkProtocol(BaseProtocol):
 
     @handle_msg.register(ConsensusMsg.leader.BEGIN_ANNOUNCEMENT)
     @check_role(RoleType.LEADER)
-    def announcement(self, type, msg, addr):
+    def prepare(self, type, msg, addr):
         batch_data = msg["data"]
         self.client_addr = msg["client"]
         self.pool.batch_pool.append(batch_data)
@@ -79,11 +80,43 @@ class NetworkProtocol(BaseProtocol):
             self.pool.package_pool[p_256] = package
             for node in self.init_status.nodes:
                 if node.addr!=self.addr:
-                    self.send_package(package, p_256, node.addr)
+                   self.send_package(package, p_256, node.addr)
+
+        # batch_data = msg["data"]
+        # self.client_addr = msg["client"]
+        # self.pool.batch_pool.append(batch_data)
+        # if len(self.pool.batch_pool) >= self.package_size:
+        #     package = Package(self.pool.batch_pool[: self.package_size])
+        #     self.pool.batch_pool = self.pool.batch_pool[self.package_size :]
+        #     p_256 = package.get_sha256()
+        #     self.time_pool[p_256] = time.perf_counter()
+        #     self.pool.package_pool[p_256] = package
+        #     for node in self.init_status.nodes:
+        #         if node.addr!=self.addr:
+        #             self.send_package(package, p_256, node.addr)
+
+    # @handle_msg.register(ConsensusMsg.leader.PREPARE)
+    # @check_role(RoleType.FOLLOWER)
+    # def rep_prepare(self, type, msg, addr):
+    #     sha256 = msg["sha256"]
+    #     agree = "Agree_prepare"
+    #     sign = self.init_status.private_key.sign(agree)
+    #     rst_msg = {
+    #         "type": ConsensusMsg.follower.REP_PREPARE,
+    #         "sign":sign,
+    #         "sha256": sha256,
+    #     }
+    #     for node in self.init_status.nodes:
+    #         if node.addr!=self.addr:
+    #             self.sendto(rst_msg, node.addr)
+
+    # @handle_msg.register(ConsensusMsg.follower.REP_PREPARE)
+    # @check_role(RoleType.FOLLOWER, RoleType.LEADER)
+    # def 
 
     @handle_msg.register(ConsensusMsg.leader.ANNOUNCEMENT)
     @check_role(RoleType.FOLLOWER)
-    def commitment(self, type, msg, addr):
+    def prepare(self, type, msg, addr):
         data = msg["data"]
         bx = msg["bx"]
         sha256 = msg["sha256"]
@@ -99,20 +132,62 @@ class NetworkProtocol(BaseProtocol):
             msg = "Agree"
             sign = self.init_status.private_key.sign(msg)
             rst_msg = {
-                "type": ConsensusMsg.follower.COMMITMENT,
+                "type": ConsensusMsg.follower.PREPARE,
                 "sign":sign,
                 "sha256": sha256,
             }
             for node in self.init_status.nodes:
+                if node.addr!=self.addr and node.addr!=self.init_status.leader.addr:
+                    self.sendto(rst_msg, node.addr)
+
+    @handle_msg.register(ConsensusMsg.follower.PREPARE)
+    @check_role(RoleType.FOLLOWER, RoleType.LEADER)
+    def rep_prepare(self, type, msg, addr):
+        sign = msg["sign"]
+        sha256 = msg["sha256"]
+        signed_node = self.init_status.addr2node[addr]
+        signed_node.init_status.public_key.verify(sign, "Agree")
+
+        msg = "Agree"
+        sign = self.init_status.private_key.sign(msg)
+        rst_msg = {
+            "type": ConsensusMsg.follower.REP_PREPARE,
+            "sign":sign,
+            "sha256": sha256,
+        }
+        self.sendto(rst_msg, addr)
+    
+    @handle_msg.register(ConsensusMsg.follower.REP_PREPARE)
+    @check_role(RoleType.FOLLOWER, RoleType.LEADER)
+    def comment(self, type, msg, addr):
+        sign = msg["sign"]
+        sha256 = msg["sha256"]
+        signed_node = self.init_status.addr2node[addr]
+        signed_node.init_status.public_key.verify(sign, "Agree")
+
+        if sha256 not in self.prepare_agree_pool.keys():
+            self.prepare_agree_pool[sha256]=1
+        else:
+            self.prepare_agree_pool[sha256]+=1
+        if self.prepare_agree_pool[sha256]>=len(self.init_status.nodes)//3*2:
+            msg = "Agree"
+            sign = self.init_status.private_key.sign(msg)
+            rst_msg = {
+                "type":ConsensusMsg.follower.COMMITMENT,
+                "sha256":sha256,
+                "sign":sign
+            }
+            for node in self.init_status.nodes:
                 if node.addr!=self.addr:
                     self.sendto(rst_msg, node.addr)
+
 
     @handle_msg.register(ConsensusMsg.follower.COMMITMENT)
     @check_role(RoleType.FOLLOWER, RoleType.LEADER)
     def aggregate_commit(self, type, msg, addr):
         sign = msg["sign"]
         sha256 = msg["sha256"]
-        sha256_bytes = bytes.fromhex(sha256)
+        # sha256_bytes = bytes.fromhex(sha256)
         signed_node = self.init_status.addr2node[addr]
         signed_node.init_status.public_key.verify(sign, "Agree")
         if self.init_status.role == RoleType.LEADER:

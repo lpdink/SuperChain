@@ -11,105 +11,7 @@ import time
 
 HUMAN_NAMES = [
     "Tammy Henrietta",
-    "Quinn",
-    "Irene Daniel",
-    "Nigel Harold",
-    "Dave Jerry",
-    "Monroe David",
-    "Taylor Bert",
-    "Melissa Alick",
-    "Felix Washington",
-    "Merry Kennan",
-    "Elijah Berkeley",
-    "Phyllis Marion",
-    "Thomas Bush",
-    "Clyde Stowe",
-    "Joseph Birrell",
-    "Lorraine Paul",
-    "Mirabelle Donne",
-    "Cecil Field",
-    "Emma Dulles",
-    "Nelson Chaplin",
-    "York Wright",
-    "Barret Sapir",
-    "Gavin Brewster",
-    "Debby Bessemer",
-    "Theobald Josh",
-    "Alberta Harte",
-    "Sandy Robin",
-    "Donahue Carey",
-    "Venus Margaret",
-    "Miranda Nell",
-    "Sharon Needham",
-    "Mandy Frederick",
-    "Kenneth Benedict",
-    "Lee Hope",
-    "Wendy Shelley",
-    "Clement Rob",
-    "Lance Scripps",
-    "Olivia Kingsley",
-    "Keith Christopher",
-    "Alger John",
-    "Will DeQuincey",
-    "Lennon Bloor",
-    "Atwood Winifred",
-    "Leo Snow",
-    "Ingram Emerson",
-    "Phil Irving",
-    "Arno Robbins",
-    "Hayden Nathaniei",
-    "Vincent Wordswort",
-    "Asa Hawthorne",
-    "Broderick Rooseve",
-    "Bob Thorndike",
-    "Horace Hoover",
-    "Athena Joshua",
-    "Beverly Jenny",
-    "Elton Bowen",
-    "Chloe Howell(s)",
-    "Zara Gresham",
-    "Gemma Wollaston",
-    "Anna Pater",
-    "Fay Taylor",
-    "Adelaide Hansom",
-    "Joanna Zacharias",
-    "Cathy Howard",
-    "Laura Pollitt",
-    "Ruth Emmie",
-    "Reg Ann",
-    "Erin Carroll",
-    "Paul Cook",
-    "King Hornby",
-    "Jeff Wheeler",
-    "Kitty North",
-    "Cora Lizzie",
-    "Joanne Adams",
-    "Jay O'Casey",
-    "Warner II.",
-    "Hobart Bertha",
-    "Ferdinand Joseph",
-    "Nick Truman",
-    "Maureen Harvey",
-    "Jack Gilbert",
-    "Olga Eden",
-    "Primo Surrey",
-    "Pandora Betty",
-    "Kelly Carter",
-    "Fanny Webb",
-    "Violet Archibald",
-    "Gary Kelsen",
-    "Cash Fred",
-    "Zoe Palmer",
-    "Madeline Electra",
-    "Wordsworth Pepys",
-    "Sherry Hudson",
-    "Agnes Joule",
-    "Spring",
-    "Madge Fox",
-    "Orville Edward",
-    "Sandy Tuttle",
-    "Les O'Connor",
-    "Parker Longfellow",
+    "Quinn Jarrectis",
 ]
 
 
@@ -128,20 +30,23 @@ class RoleType:
 
 class UserMessage:
     # 共识算法的用户消息体
-    def __init__(self, src, dst, type_idx, amount, time) -> None:
+    def __init__(self, src, dst, type_idx, amount, time, padding) -> None:
         self.src = src
         self.dst = dst
         self.type_idx = type_idx
         self.amount = amount
         self.time = time
+        self.padding = padding
 
     @classmethod
     def random_msg(cls):
-        src, dst = random.choices(HUMAN_NAMES, k=2)
+        # src, dst = random.choices(HUMAN_NAMES, k=2)
+        src, dst = HUMAN_NAMES
         type_idx = random.randint(100, 142)
-        amount = random.randint(100, 99999)
+        amount = random.randint(100, 199)
         time_ = time.time().hex()
-        return cls(src, dst, type_idx, amount, time_).__dict__
+        padding = "0"*118
+        return cls(src, dst, type_idx, amount, time_, padding).__dict__
 
     @classmethod
     def random_msgs(cls, num):
