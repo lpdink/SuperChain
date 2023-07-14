@@ -8,10 +8,16 @@ pip install -r requirements.txt
 ## Usage
 ```
 # run server
-python server.py
+python consensus_server.py
 
-# run client
-python client.py
-# 按照提示，拷贝server终端中打印的任何一个service端口，输入到client中，点击绑定。
-# 之后任意输入日志，提交日志。
+# 测试tps:
+python consensus_client.py
+
+# 或者交互式的终端：
+python cmd_client.py
 ```
+
+## 配置说明
+
+可以修改SuperChain/resources/consensus_node.json中的nums来决定起多少个区块链节点，由于满二叉树+一个信箱的设计，需要是偶数。  
+可以修改SuperChain/resources/config.json中的consensus.batch_size(由于tcp通信报文大小限制，不要超过256)和n包压一包配置：consensus.package_size（单机测试不要过大，否则网卡扛不住）  
